@@ -1,0 +1,312 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif\r\n"
+    "#include ""res\\AppDemo.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\AppDemo.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG 0, 0, 217, 44
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About AppDemo"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "AppDemo Version 1.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 1999",IDC_STATIC,40,29,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,32,14,WS_GROUP
+END
+
+IDD_APPDEMO_DIALOG DIALOGEX 0, 0, 554, 419
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "AppDemo"
+MENU IDR_APP_MENU
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Exit",IDOK,497,398,50,14
+    LTEXT           "",IDC_DRAW,7,7,414,404,SS_SUNKEN
+    GROUPBOX        "Source",IDC_SOURCE_STATIC,426,3,121,43
+    COMBOBOX        IDC_SOURCE_COMBO,430,15,51,59,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SAM_EDIT,513,15,18,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Points:",IDC_POINTS_STATIC,488,17,23,11
+    GROUPBOX        "Approximation",IDC_STATIC,426,61,121,66
+    LTEXT           "Points:",IDC_APPPOINTS_STATIC,429,75,23,11
+    EDITTEXT        IDC_RESAM_EDIT,454,74,18,12,ES_AUTOHSCROLL
+    LTEXT           "Order:",IDC_ORDER_STATIC,483,75,23,11
+    EDITTEXT        IDC_ORDER_EDIT,507,74,23,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "->",IDC_STEP_BTN,430,108,32,12
+    PUSHBUTTON      "Reset",IDC_RESET_BTN,507,108,32,12
+    LTEXT           "Lambda:",IDC_LAMBDA_STATIC,476,92,27,10
+    EDITTEXT        IDC_LAM_EDIT,507,90,23,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Error:",IDC_ERR_STATIC,433,92,18,10
+    EDITTEXT        IDC_ERR_EDIT,454,90,18,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Clear",IDC_CLEAR_BTN,431,31,49,12
+    GROUPBOX        "Show",IDC_DRAW_STATIC,426,139,121,38
+    CONTROL         "Source",IDC_DRAW_SOURCE_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,433,148,36,10
+    CONTROL         "Approximation",IDC_DRAW_APPROX_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,486,148,58,10
+    CONTROL         "Sampling",IDC_DRAW_RESAM_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,433,162,41,10
+    CONTROL         "Bezier",IDC_DRAW_BEZIER_CHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,486,162,33,10
+    COMBOBOX        IDC_SOURCE_COMBO2,430,15,51,59,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "AppDemo MFC Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "AppDemo"
+            VALUE "LegalCopyright", "Copyright (C) 1999"
+            VALUE "OriginalFilename", "AppDemo.EXE"
+            VALUE "ProductName", "AppDemo Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 210
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 37
+    END
+
+    IDD_APPDEMO_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 547
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 412
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_APP_MENU MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New",                        ID_FILE_NEW
+        MENUITEM "&Open",                       ID_FILE_OPEN
+        MENUITEM "&Save",                       ID_FILE_SAVE
+        MENUITEM "Save &As",                    ID_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_EXIT
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About",                      ID_HELP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_APPDEMO_DIALOG DLGINIT
+BEGIN
+    IDC_SOURCE_COMBO, 0x403, 9, 0
+0x7246, 0x6565, 0x6148, 0x646e, "\000" 
+    IDC_SOURCE_COMBO, 0x403, 7, 0
+0x7153, 0x6175, 0x6572, "\000" 
+    IDC_SOURCE_COMBO, 0x403, 9, 0
+0x7254, 0x6169, 0x676e, 0x656c, "\000" 
+    IDC_SOURCE_COMBO, 0x403, 7, 0
+0x614c, 0x626d, 0x6164, "\000" 
+    IDC_SOURCE_COMBO2, 0x403, 9, 0
+0x7246, 0x6565, 0x6148, 0x646e, "\000" 
+    IDC_SOURCE_COMBO2, 0x403, 7, 0
+0x7153, 0x6175, 0x6572, "\000" 
+    IDC_SOURCE_COMBO2, 0x403, 9, 0
+0x7254, 0x6169, 0x676e, 0x656c, "\000" 
+    IDC_SOURCE_COMBO2, 0x403, 7, 0
+0x614c, 0x626d, 0x6164, "\000" 
+    IDC_SOURCE_COMBO2, 0x403, 11, 0
+0x6f50, 0x796c, 0x6f6e, 0x696d, 0x6c61, "\000" 
+    IDC_SOURCE_COMBO2, 0x403, 9, 0
+0x7546, 0x636e, 0x6974, 0x6e6f, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_PEN_CURSOR          CURSOR                  "res\\cur00002.cur"
+
+IDC_DRAG_CURSOR         CURSOR                  "res\\cursor1.cur"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_APPDEMO_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ABOUTBOX            "&About AppDemo..."
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "New\nNew"
+    ID_FILE_OPEN            "Open\nOpen"
+    ID_FILE_SAVE            "Save\nSave"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_SAVEAS          "Save As...\nSave As"
+    ID_EXIT                 "Exit\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_HELP                 "About\nAbout"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif
+#include "res\AppDemo.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
