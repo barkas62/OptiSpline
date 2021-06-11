@@ -5,17 +5,6 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-/*
-#ifdef WIN32
-	#ifdef OPTISPLINE_EXPORTS
-		#define EXPORT __declspec(dllexport)
-	#else
-		#define EXPORT __declspec(dllimport)
-	#endif
-#else
-	#define EXPORT
-#endif
-*/
 #include "Stroke.h"
 #include "Basis.h"
  
