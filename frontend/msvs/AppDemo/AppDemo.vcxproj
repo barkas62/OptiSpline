@@ -91,7 +91,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>OptiSplime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OptiSpline.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\Projects\OptiSpline\frontend\msvs\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
