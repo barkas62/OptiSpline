@@ -99,7 +99,10 @@
       <OutputFile>.\Release/AppDemo.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\demos\AppDemo</Command>
+      <Command>if not exist ..\..\..\..\..\bin\win\demos\AppDemo\ (
+  mkdir  ..\..\..\..\..\bin\win\demos\AppDemo\
+);
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\demos\AppDemo</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -149,7 +152,10 @@
       <OutputFile>.\Debug/AppDemo.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\demos\AppDemo</Command>
+      <Command>if not exist ..\..\..\..\..\bin\win\demos\AppDemo\ (
+  mkdir  ..\..\..\..\..\bin\win\demos\AppDemo\
+);
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\demos\AppDemo</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -109,7 +109,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\lib</Command>
+      <Command>if not exist ..\..\..\..\..\bin\win\lib\ (
+  mkdir  ..\..\..\..\..\bin\win\lib\
+); 
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,7 +134,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\lib</Command>
+      <Command>if not exist ..\..\..\..\..\bin\win\lib\ (
+  mkdir  ..\..\..\..\..\bin\win\lib\
+); 
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\lib</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
