@@ -5,8 +5,6 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-//#include "rsdata.h"
-
 typedef struct {
 	float    s;
 	float    r;

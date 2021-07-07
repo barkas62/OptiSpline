@@ -46,10 +46,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
+    <OutDir>$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -60,13 +62,20 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\Projects\OptiSpline\lib\src\cplusplus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\src\cplusplus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\AppStroke\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>AppStroke.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)AppDemo\$(Configuration)\;
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\lib;
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\demos\AppDemo</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -79,7 +88,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\Projects\OptiSpline\lib\src\cplusplus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\src\cplusplus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -89,19 +98,20 @@
       <EnableUAC>false</EnableUAC>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <AdditionalLibraryDirectories>..\AppStroke\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>AppStroke.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)AppDemo\$(Configuration)\;
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\lib;
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\demos\AppDemo</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\cplusplus\AppStroke.h" />
-    <ClInclude Include="..\..\..\..\src\cplusplus\Basis.h" />
-    <ClInclude Include="..\..\..\..\src\cplusplus\Stroke.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="OptiSpline.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\cplusplus\AppStroke.cpp" />
-    <ClCompile Include="..\..\..\..\src\cplusplus\Basis.cpp" />
-    <ClCompile Include="..\..\..\..\src\cplusplus\Stroke.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="OptiSpline.cpp" />
   </ItemGroup>
