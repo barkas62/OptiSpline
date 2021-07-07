@@ -114,10 +114,14 @@ copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\demos\x86\AppDemo
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="OptiSpline.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="OptiSpline.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OptiSpline.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,26 +7,33 @@
 #endif
 
 
-extern "C" OPTISPLINE_API
-void* CreateOptiSpline(int nDim, int nSam, int nOrd, int nResam, float * pPnt);
+#ifdef __cplusplus
+extern "C" {
+#endif
+	OPTISPLINE_API
+		void* CreateOptiSpline(int nDim, int nSam, int nOrd, int nResam, float* pPnt);
 
-extern "C" OPTISPLINE_API
-void DestroyOptiSpline(void* pInstance);
+	OPTISPLINE_API
+		void DestroyOptiSpline(void* pInstance);
 
-extern "C" OPTISPLINE_API
-void* CopyOptiSpline(void* pInstance);
+	OPTISPLINE_API
+		void* CopyOptiSpline(void* pInstance);
 
-extern "C" OPTISPLINE_API
-void OptiSplineApprox(void* pInstance, int nStep, float MaxErr = -1.0f);
+	OPTISPLINE_API
+		void OptiSplineApprox(void* pInstance, int nStep, float MaxErr = -1.0f);
 
-extern "C" OPTISPLINE_API
-int GetOptiSplineApp(void* pInstance, float* pApp, int Dim, int ReSam);
+	OPTISPLINE_API
+		int GetOptiSplineApp(void* pInstance, float* pApp, int Dim, int ReSam);
 
-extern "C" OPTISPLINE_API
-int GetOptiSplineRsm(void* pInstance, float* pRsm, int Dim, int ReSam);
+	OPTISPLINE_API
+		int GetOptiSplineRsm(void* pInstance, float* pRsm, int Dim, int ReSam);
 
-extern "C" OPTISPLINE_API
-float GetOptiSplineErr(void* pInstance);
+	OPTISPLINE_API
+		float GetOptiSplineErr(void* pInstance);
 
-extern "C" OPTISPLINE_API
-float GetOptiSplineLam(void* pInstance);
+	OPTISPLINE_API
+		float GetOptiSplineLam(void* pInstance);
+
+#ifdef __cplusplus
+}
+#endif
