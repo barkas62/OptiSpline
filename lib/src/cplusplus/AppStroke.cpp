@@ -151,9 +151,10 @@ void   AppStroke::LoadRsmState()
 	memcpy( m_pRsm, (void *)m_pBck, cb );
 }
 
-void   AppStroke::ParamApp( int nItr, float MaxErr )     
+int   AppStroke::ParamApp( int nItr, float MaxErr )     
 {
-	for( int it = 0; it < nItr; it++ )
+	int it = 0;
+	for( ; it < nItr; it++ )
 	{
 		Repar  ();
 		Approx ();
@@ -162,7 +163,8 @@ void   AppStroke::ParamApp( int nItr, float MaxErr )
 		if (MaxErr > 0.0f && m_Err < MaxErr)
 			break;
 	} // End of it
-
+	
+	return it;
 }
 
 void   AppStroke::Approx()
@@ -355,7 +357,6 @@ void  AppStroke::SetNaturalParam()
 	ResetParam();
 	Repar     ();
 }
-
 
 float  AppStroke::PolyError2( float * pDat )
 {

@@ -42,8 +42,8 @@ Stroke::Stroke( Stroke& S )
 	if (S.m_Sam > 0)
 	{
 		m_Sam = S.m_Sam;
-		memcpy(m_pOrg,   S.m_pOrg,   m_Dim * m_Sam * sizeof(float));
-		memcpy(m_pOrgRS, S.m_pOrgRS, m_Sam * sizeof(_RSDATA));
+		memcpy(m_pOrg,   S.m_pOrg,   m_Dim*m_Sam*sizeof(float));
+		memcpy(m_pOrgRS, S.m_pOrgRS, m_Sam*sizeof(_RSDATA));
 	}
 
 }

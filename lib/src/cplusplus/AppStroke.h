@@ -38,7 +38,7 @@ public:
 	void	Restore   ();
 	void	Approx    ();
 
-	void	ParamApp  ( int nItr, float MaxErr = -1.0f);
+	int	ParamApp  ( int nItr, float MaxErr = -1.0f);
 
 	void	ResetParam();
 	void	Repar     ();
@@ -49,6 +49,8 @@ public:
 
 	void	SaveRsmState();
 	void	LoadRsmState();
+
+	float   GetErr() { return m_Err; }
 
 	float   PolyError2( float * pDat = 0 );
 	void    Rsm2App   ();
