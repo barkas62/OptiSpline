@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<title>AppDemo</title>
+<link rel="stylesheet" href="css/grid.css">
+
+<script type="text/javascript" src="scripts/app_demo.js"></script>
+
+</head>
+<body>
+    <h1>AppDemo</h1>
+    <div class="app-grid">
+        <div class="app-grid-panel-draw">
+            <div id="canvas-placeholder">
+            </div>
+            <script>
+                let state = {
+                  tool: "draw",
+                  color: "#000000",
+                  stroke: new BStroke(32, 7, [])
+                };
+                //tool, state, controls, dispatch
+
+                let app = new AppDemo(state, {
+                    tools: {draw},
+                    controls: [],
+                    dispatch(action) {
+                    state = updateState(state, action);
+                    app.syncState(state);
+                    }
+                });
+                document.getElementById("canvas-placeholder").appendChild(app.dom);
+              </script>
+        </div>
+        <div class="app-grid-panel-source">
+            source
+            <script>
+                document.body.appendChild(elt("button", {
+                    onclick: () => console.log("v0.1.1")
+                }, "The button"));
+          </script>
+        </div>
+        <div class="app-grid-panel-approx">
+            approx
+        </div>
+        <div class="app-grid-panel-show">
+            show
+        </div>
+    </div>
+
+
+</body>
+</html>

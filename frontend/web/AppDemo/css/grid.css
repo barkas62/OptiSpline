@@ -1,0 +1,47 @@
+.app-grid {
+    display: grid;
+    grid-gap: 5px;
+    grid-template-rows: 250px 250px 250px;
+    grid-template-columns: 750px 300px;
+    background-color: #e4e4e4;
+  }
+  .app-grid-panel-draw {
+    grid-row: 1 / 4;
+    grid-column: 1;
+  }
+
+  .app-grid-panel-source {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .app-grid-panel-approx {
+    grid-row: 2;
+    grid-column: 2;
+  }
+  .app-grid-panel-show {
+    grid-row: 3;
+    grid-column: 2;
+  }
+
+  [class^='app-grid-panel'] {
+    outline: 1px solid rgb(0, 0, 0);
+    font-size: 30px;
+    color: #333;
+  }
+
+  #canvas-placeholder { 
+    background-color:#acd3ce; 
+    width:750px; 
+    height:750px; 
+
+    cursor:crosshair; 
+  }
+
+  #drawing-canvas { 
+    position:absolute;
+    border:  3px solid rgb(0, 0, 0); 
+    color:rgb(218, 13, 13); 
+    overflow:hidden; 
+    background-color:transparent; 
+    } 
+   #tempCanvas { position: absolute; width:897px; height:532px; overflow:hidden; }
