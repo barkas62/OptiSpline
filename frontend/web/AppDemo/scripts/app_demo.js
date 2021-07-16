@@ -79,13 +79,14 @@ function drawStroke(stroke, canvas) {
 StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
     if (downEvent.button != 0) return;
     console.log("in mouse: " + downEvent.x.toString() + " " + downEvent.y.toString());
+    this.stroke.reset()
     let pos = pointerPosition(downEvent, this.dom);
     let onMove = onDown(pos);
     if (!onMove) return;
 
-    let move = moveEvent => {
+    let mouseMove = moveEvent => {
       if (moveEvent.buttons == 0) {
-        this.dom.removeEventListener("mousemove", move);
+        this.dom.removeEventListener("mousemove", mouseMove);
       } else {
         let newPos = pointerPosition(moveEvent, this.dom);
         if (newPos.x == pos.x && newPos.y == pos.y) return;
@@ -93,7 +94,14 @@ StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
         onMove(newPos);
       }
     };
-    this.dom.addEventListener("mousemove", move);
+
+    let mouseUp = upEvent => {
+      console.log("in mouseUp: stroke length: " + this.stroke.org_points.length.toString());
+      this.dom.removeEventListener("mouseup", mouseUp);
+    };
+
+    this.dom.addEventListener("mousemove", mouseMove);
+    this.dom.addEventListener("mouseup"  , mouseUp  );
 };
   
 function pointerPosition(pos, domNode) {
