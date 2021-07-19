@@ -16,6 +16,10 @@ class BStroke {
         this.lam = 0.0;
     }
 
+    sam() {
+      return this.org_points.length;
+    }
+
     draw(points) {
         let copy_points = this.org_points.concat(points);
         return new BStroke(this.resam, this.order, copy_points);
@@ -39,19 +43,19 @@ function elt(type, props, ...children) {
   }
   
 class StrokeCanvas {
-    constructor(stroke, pointerDown) {
+    constructor(source, stroke, pointerDown) {
         this.dom = elt("canvas", {
             onmousedown: event => this.mouse(event, pointerDown),
             ontouchstart: event => this.touch(event, pointerDown)
         });
-        this.syncState(stroke);
+        this.syncState(source, stroke);
     }
 
-    syncState(stroke) {
-        if (this.stroke == stroke) 
-            return;
-
-        this.stroke = stroke;
+    syncState(source, stroke) {
+      this.source = source;
+      if (this.stroke != stroke){
+          this.stroke = stroke;
+        }
         drawStroke(this.stroke, this.dom);
     }
 }
@@ -62,6 +66,9 @@ function drawStroke(stroke, canvas) {
 
     let cx = canvas.getContext("2d");
     //console.log("in drawStroke: length: " + stroke.org_points.length.toString());
+    let nOrg = stroke.org_points.length; 
+    if( nOrg == 0)
+      return;
 
     cx.beginPath();
     let x0 = stroke.org_points[0];
@@ -78,8 +85,12 @@ function drawStroke(stroke, canvas) {
 
 StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
     if (downEvent.button != 0) return;
-    console.log("in mouse: " + downEvent.x.toString() + " " + downEvent.y.toString());
-    this.stroke.reset()
+    this.stroke.reset();
+    console.log("in mouse: " + this.stroke.sam());
+
+    if (this.source != "freehand")
+      return;
+  
     let pos = pointerPosition(downEvent, this.dom);
     let onMove = onDown(pos);
     if (!onMove) return;
@@ -134,24 +145,58 @@ StrokeCanvas.prototype.touch = function(startEvent, onDown) {
 
 class AppDemo {
     constructor(state, config) {
-        let {tools, controls, dispatch} = config;
+        let {sources, controls, dispatch} = config;
         this.state = state;
   
-      this.canvas = new StrokeCanvas( state.stroke, pos => {
-        let tool = tools[this.state.tool];
-        let onMove = tool(pos, this.state, dispatch);
+      this.canvas = new StrokeCanvas( state.source, state.stroke, pos => {
+        let onMove = draw(pos, this.state, dispatch);
         if (onMove) return pos => onMove(pos, this.state);
       });
       
-    
-      this.controls = [] //controls.map( Control => new Control(state, config) );
+      console.log("Setting controls");
+      this.controls = controls.map( Control => new Control(state, config) );
+      console.log("Controls set");
 
       this.dom = elt("div", {}, this.canvas.dom, elt("br"));
     }
 
     syncState(state) {
+      console.log("in AppDemo.syncState: " + state.source); 
+      if (state.source != this.state.source){
+        // Source changed
+        let D = 250.0;
+        switch(state.source){
+          case "freehand":
+            state.stroke = new BStroke(32, 7, []);
+          break;
+          case "square":
+            state.stroke = new BStroke(32, 7, 
+              [  D,   D, 
+               2*D,   D,
+               2*D, 2*D,
+                 D, 2*D,
+                 D,   D]);
+          break;  
+          case "triangle":
+            state.stroke = new BStroke(32, 7, 
+              [3*D/2,  D, 
+               2*D,  2*D,
+                 D,  2*D,
+               3*D/2,  D]);
+            break;
+            case "lambda":
+              state.stroke = new BStroke(32, 7, 
+                [  D/2, 2*D, 
+                   D,   2*D,
+                 3*D/2,   D,
+                 2*D,   2*D, 
+                 5*D/2, 2*D]);
+              break;
+        }
+         
+      }
       this.state = state;
-      this.canvas.syncState(state.stroke);
+      this.canvas.syncState(state.source, state.stroke);
       for (let ctrl of this.controls) ctrl.syncState(state);
     }
   }
@@ -165,5 +210,50 @@ function draw(pos, state, dispatch) {
     drawPoint(pos, state);
     return drawPoint;
 }
+
+class SourceSelect {
+  constructor(state, {sources, dispatch}) {
+    this.parent_id = "panel-source";
+    this.select = elt("select", {
+      onchange: () => dispatch({source: this.select.value})
+    }, ...sources.map(name => elt("option", {
+      selected: name == state.source
+    }, name)));
+    this.dom = elt("label", null, "Source: ", this.select);
+
+    console.log("SourceSelect.parent_id: " + this.parent_id);
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+  syncState(state) { this.select.value = state.source; }
+}
+
+const startState = {
+  source: "freehand",
+  iter: 0,
+  stroke: new BStroke(32, 7, [])
+};
+
+const baseSources = ["freehand", "square", "triangle", "lambda"];
+
+const baseControls = [
+  SourceSelect 
+];  
+
+function startAppDemo({state    = startState,
+                       sources  = baseSources,
+                       controls = baseControls}) {
+  let app = new AppDemo(state, {
+    sources,
+    controls,
+    dispatch(action) {
+      state = updateState(state, action);
+      app.syncState(state);
+  }
+  });
+  return app.dom;
+}
+
+
+
 
 

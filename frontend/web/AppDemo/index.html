@@ -13,32 +13,8 @@
         <div class="app-grid-panel-draw">
             <div id="canvas-placeholder">
             </div>
-            <script>
-                let state = {
-                  tool: "draw",
-                  color: "#000000",
-                  stroke: new BStroke(32, 7, [])
-                };
-                //tool, state, controls, dispatch
-
-                let app = new AppDemo(state, {
-                    tools: {draw},
-                    controls: [],
-                    dispatch(action) {
-                    state = updateState(state, action);
-                    app.syncState(state);
-                    }
-                });
-                document.getElementById("canvas-placeholder").appendChild(app.dom);
-              </script>
         </div>
-        <div class="app-grid-panel-source">
-            source
-            <script>
-                document.body.appendChild(elt("button", {
-                    onclick: () => console.log("v0.1.2")
-                }, "The button"));
-          </script>
+        <div class="app-grid-panel-source" id = "panel-source">
         </div>
         <div class="app-grid-panel-approx">
             approx
@@ -48,6 +24,9 @@
         </div>
     </div>
 
+    <script>
+        document.getElementById("canvas-placeholder").appendChild(startAppDemo({}));
+    </script>
 
 </body>
 </html>
