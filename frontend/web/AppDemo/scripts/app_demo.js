@@ -1,4 +1,4 @@
-class BStroke {
+class AppStroke {
     constructor(resam, ord, points) {
         this.reset();
 
@@ -17,12 +17,12 @@ class BStroke {
     }
 
     sam() {
-      return this.org_points.length;
+      return this.org_points.length/2;
     }
 
     draw(points) {
         let copy_points = this.org_points.concat(points);
-        return new BStroke(this.resam, this.order, copy_points);
+        return new AppStroke(this.resam, this.order, copy_points);
       }
 
 }
@@ -167,10 +167,10 @@ class AppDemo {
         let D = 250.0;
         switch(state.source){
           case "freehand":
-            state.stroke = new BStroke(32, 7, []);
+            state.stroke = new AppStroke(32, 7, []);
           break;
           case "square":
-            state.stroke = new BStroke(32, 7, 
+            state.stroke = new AppStroke(32, 7, 
               [  D,   D, 
                2*D,   D,
                2*D, 2*D,
@@ -178,14 +178,14 @@ class AppDemo {
                  D,   D]);
           break;  
           case "triangle":
-            state.stroke = new BStroke(32, 7, 
+            state.stroke = new AppStroke(32, 7, 
               [3*D/2,  D, 
                2*D,  2*D,
                  D,  2*D,
                3*D/2,  D]);
             break;
             case "lambda":
-              state.stroke = new BStroke(32, 7, 
+              state.stroke = new AppStroke(32, 7, 
                 [  D/2, 2*D, 
                    D,   2*D,
                  3*D/2,   D,
@@ -227,16 +227,29 @@ class SourceSelect {
   syncState(state) { this.select.value = state.source; }
 }
 
+class SamText{
+  constructor(state, {stroke, dispatch}){
+    this.parent_id = "panel-sam";
+    this.dom = elt("p", null, "Sam: " + state.stroke.sam().toString());
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+  syncState(state) { 
+    console.log("SamText: stroke length: " + state.stroke.sam().toString());
+    this.dom.innerHTML = "Sam: " + state.stroke.sam().toString();
+   }
+}
+
 const startState = {
   source: "freehand",
   iter: 0,
-  stroke: new BStroke(32, 7, [])
+  stroke: new AppStroke(32, 7, [])
 };
 
 const baseSources = ["freehand", "square", "triangle", "lambda"];
 
 const baseControls = [
-  SourceSelect 
+  SourceSelect,
+  SamText 
 ];  
 
 function startAppDemo({state    = startState,
