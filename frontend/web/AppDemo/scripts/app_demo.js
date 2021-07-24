@@ -1,31 +1,4 @@
-class AppStroke {
-    constructor(resam, ord, points) {
-        this.reset();
 
-        this.resam = resam;
-        this.order = ord;
-        this.org_points = points;
-    }
-
-    reset(){
-        this.org_points = new Array();
-        this.rsm_points = [];
-        this.app_points = [];
-        
-        this.err = 0.0;
-        this.lam = 0.0;
-    }
-
-    sam() {
-      return this.org_points.length/2;
-    }
-
-    draw(points) {
-        let copy_points = this.org_points.concat(points);
-        return new AppStroke(this.resam, this.order, copy_points);
-      }
-
-}
 
 function updateState(state, action) {
     return Object.assign({}, state, action);
@@ -167,10 +140,10 @@ class AppDemo {
         let D = 250.0;
         switch(state.source){
           case "freehand":
-            state.stroke = new AppStroke(32, 7, []);
+            state.stroke = new AppStroke([]);
           break;
           case "square":
-            state.stroke = new AppStroke(32, 7, 
+            state.stroke = new AppStroke( 
               [  D,   D, 
                2*D,   D,
                2*D, 2*D,
@@ -178,14 +151,14 @@ class AppDemo {
                  D,   D]);
           break;  
           case "triangle":
-            state.stroke = new AppStroke(32, 7, 
+            state.stroke = new AppStroke( 
               [3*D/2,  D, 
                2*D,  2*D,
                  D,  2*D,
                3*D/2,  D]);
             break;
             case "lambda":
-              state.stroke = new AppStroke(32, 7, 
+              state.stroke = new AppStroke( 
                 [  D/2, 2*D, 
                    D,   2*D,
                  3*D/2,   D,
@@ -242,7 +215,7 @@ class SamText{
 const startState = {
   source: "freehand",
   iter: 0,
-  stroke: new AppStroke(32, 7, [])
+  stroke: new AppStroke([])
 };
 
 const baseSources = ["freehand", "square", "triangle", "lambda"];
