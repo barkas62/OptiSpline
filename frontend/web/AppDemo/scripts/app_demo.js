@@ -207,8 +207,14 @@ class AppDemo {
                  5*D/2, 2*D]);
               break;
         }
+        state.iter = 0;
         state.stroke.init_approx(state.resam, state.ord); 
       }
+
+      if (state.iter > this.state.iter){
+        state.stroke.param_app(state.iter - this.state.iter, -1);
+      }
+
       this.state = state;
       this.canvas.syncState(state);
       for (let ctrl of this.controls) ctrl.syncState(state);
@@ -254,15 +260,16 @@ class SamText{
 }
 
 class StepButton {
-  constructor(state) {
+  constructor(state, {dispatch}) {
     this.parent_id = "panel-step";
-    this.dom = elt("button", { onclick: () => this.iter_step() }, ">" + state.iter.toString());
+    this.iter = state.iter
+    this.dom = elt("button", { onclick: () => dispatch({iter: this.iter+1}) }, ">" + state.iter.toString());
     document.getElementById(this.parent_id).appendChild(this.dom);
   }
-  iter_step() {
 
-  }
-  syncState(state) { this.value = ">" + state.iter.toString(); }
+  syncState(state) { 
+    this.iter = state.iter;
+    this.dom.innerHTML = ">" + this.iter.toString(); }
 }
 
 const startState = {
