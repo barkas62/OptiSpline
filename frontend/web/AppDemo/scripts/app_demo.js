@@ -1,4 +1,6 @@
-
+const DRAW_SRC = 1
+const DRAW_APP = 2
+const DRAW_RSM = 4
 
 function updateState(state, action) {
     return Object.assign({}, state, action);
@@ -16,52 +18,88 @@ function elt(type, props, ...children) {
   }
   
 class StrokeCanvas {
-    constructor(source, stroke, pointerDown) {
+    constructor(state, pointerDown) {
         this.dom = elt("canvas", {
             onmousedown: event => this.mouse(event, pointerDown),
             ontouchstart: event => this.touch(event, pointerDown)
         });
-        this.syncState(source, stroke);
+        this.syncState(state);
     }
 
-    syncState(source, stroke) {
-      this.source = source;
-      if (this.stroke != stroke){
-          this.stroke = stroke;
-        }
-        drawStroke(this.stroke, this.dom);
+    syncState(state) {
+      this.state = state;
+
+      drawStroke(this.state.stroke, this.dom, this.state.what2draw);
     }
 }
 
-function drawStroke(stroke, canvas) {
+function drawStroke(stroke, canvas, what2draw) {
     canvas.width  = 748;
     canvas.height = 748;
 
     let cx = canvas.getContext("2d");
-    //console.log("in drawStroke: length: " + stroke.org_points.length.toString());
-    let nOrg = stroke.org_points.length; 
-    if( nOrg == 0)
-      return;
+    console.log("in drawStroke: what2draw: " + what2draw.toString());
 
-    cx.beginPath();
-    let x0 = stroke.org_points[0];
-    let y0 = stroke.org_points[1];
-    cx.lineTo(x0, y0);
-    for (let i = 1; i < stroke.org_points.length; i++) {
-        let x = stroke.org_points[2*i+0];
-        let y = stroke.org_points[2*i+1];
-        //console.log("in drawStroke: " + x.toString() + " " + y.toString());
-        cx.lineTo(x, y);
+    if ((what2draw & DRAW_SRC) && stroke.org_points.length != 0){
+      cx.beginPath();
+      let x0 = stroke.org_points[0];
+      let y0 = stroke.org_points[1];
+      cx.lineTo(x0, y0);
+      for (let i = 1; i < stroke.org_points.length; i++) {
+          let x = stroke.org_points[2*i+0];
+          let y = stroke.org_points[2*i+1];
+          //console.log("in drawStroke: " + x.toString() + " " + y.toString());
+          cx.lineTo(x, y);
+      }
+      cx.strokeStyle = "blue";
+      cx.stroke();
     }
-    cx.stroke();
+
+    if ((what2draw & DRAW_APP) && stroke.app_points.length != 0){
+      cx.beginPath();
+      let x0 = stroke.app_points[0];
+      let y0 = stroke.app_points[1];
+      cx.lineTo(x0, y0);
+      for (let i = 1; i < stroke.app_points.length; i++) {
+          let x = stroke.app_points[2*i+0];
+          let y = stroke.app_points[2*i+1];
+          //console.log("in drawStroke: " + x.toString() + " " + y.toString());
+          cx.lineTo(x, y);
+      }
+      cx.strokeStyle = "red";
+      cx.stroke();
+    }
+
+    if ((what2draw & DRAW_RSM) && stroke.rsm_points.length != 0){
+      for (let i = 0; i < stroke.rsm_points.length; i++) {
+          let x = stroke.rsm_points[2*i+0];
+          let y = stroke.rsm_points[2*i+1];
+          cx.beginPath();
+          cx.arc(x, y, 1, 0, 2*Math.PI, false);
+          cx.strokeStyle = "black";
+          cx.stroke();
+      }
+    }
+
+    if((what2draw & DRAW_RSM) && stroke.app_points.length != 0){
+      for (let i = 0; i < stroke.app_points.length; i++) {
+          let x = stroke.app_points[2*i+0];
+          let y = stroke.app_points[2*i+1];
+          cx.beginPath();
+          cx.arc(x, y, 1, 0, 2*Math.PI, false);
+          cx.strokeStyle = "black";
+          cx.stroke();
+      }
+    }
+
 }
 
 StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
     if (downEvent.button != 0) return;
-    this.stroke.reset();
-    console.log("in mouse: " + this.stroke.sam());
+    this.state.stroke.reset();
+    console.log("in mouse: " + this.state.stroke.sam());
 
-    if (this.source != "freehand")
+    if (this.state.source != "freehand")
       return;
   
     let pos = pointerPosition(downEvent, this.dom);
@@ -80,8 +118,10 @@ StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
     };
 
     let mouseUp = upEvent => {
-      console.log("in mouseUp: stroke length: " + this.stroke.org_points.length.toString());
+      console.log("in mouseUp: stroke length: " + this.state.stroke.org_points.length.toString());
       this.dom.removeEventListener("mouseup", mouseUp);
+      this.state.stroke.init_approx(this.state.resam, this.state.ord);
+      drawStroke(this.state.stroke, this.dom, this.state.what2draw);
     };
 
     this.dom.addEventListener("mousemove", mouseMove);
@@ -121,7 +161,8 @@ class AppDemo {
         let {sources, controls, dispatch} = config;
         this.state = state;
   
-      this.canvas = new StrokeCanvas( state.source, state.stroke, pos => {
+      this.canvas = new StrokeCanvas( state, 
+        pos => {
         let onMove = draw(pos, this.state, dispatch);
         if (onMove) return pos => onMove(pos, this.state);
       });
@@ -166,10 +207,10 @@ class AppDemo {
                  5*D/2, 2*D]);
               break;
         }
-         
+        state.stroke.init_approx(state.resam, state.ord); 
       }
       this.state = state;
-      this.canvas.syncState(state.source, state.stroke);
+      this.canvas.syncState(state);
       for (let ctrl of this.controls) ctrl.syncState(state);
     }
   }
@@ -212,9 +253,25 @@ class SamText{
    }
 }
 
+class StepButton {
+  constructor(state) {
+    this.parent_id = "panel-step";
+    this.dom = elt("button", { onclick: () => this.iter_step() }, ">" + state.iter.toString());
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+  iter_step() {
+
+  }
+  syncState(state) { this.value = ">" + state.iter.toString(); }
+}
+
 const startState = {
-  source: "freehand",
-  iter: 0,
+  source    : "freehand",
+  what2draw : DRAW_SRC | DRAW_APP | DRAW_RSM, 
+  iter      : 0,
+  err       : 0,
+  resam     : 32,
+  ord       : 9,
   stroke: new AppStroke([])
 };
 
@@ -222,7 +279,8 @@ const baseSources = ["freehand", "square", "triangle", "lambda"];
 
 const baseControls = [
   SourceSelect,
-  SamText 
+  SamText, 
+  StepButton 
 ];  
 
 function startAppDemo({state    = startState,

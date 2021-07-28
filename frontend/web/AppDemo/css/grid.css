@@ -68,3 +68,45 @@
     font-size: 20px;
     color: #333;
   }
+
+  .approx-grid {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-rows: 50px 50px 50px 100px;
+    grid-template-columns: 150px 150px;
+    background-color: #e4e4e4;
+  }
+
+  .approx-grid-panel-resam {
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .source-grid-panel-ord {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .approx-grid-panel-step {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  .approx-grid-panel-reset {
+    grid-row: 2;
+    grid-column: 2;
+  }
+
+  .approx-grid-panel-err {
+    grid-row: 3;
+    grid-column: 1;
+  }
+  .approx-grid-panel-lam {
+    grid-row: 3;
+    grid-column: 2;
+  }
+
+  [class^='approx-grid-panel'] {
+    outline: 0px solid rgb(0, 0, 0);
+    font-size: 20px;
+    color: #333;
+  }

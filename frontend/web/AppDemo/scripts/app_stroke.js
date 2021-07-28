@@ -28,7 +28,19 @@ class AppStroke {
         this.lam = 0.0;
     }
 
+    sam() {
+        return this.org_points.length/2;
+      }
+  
+    draw(points) {
+          let copy_points = this.org_points.concat(points);
+          return new AppStroke(copy_points);
+    }
+
     init_approx(resam, ord){
+        if (this.org_points.length == 0)
+            return;
+
         this.resam = resam;
         this.ord   = ord;
 
@@ -185,15 +197,6 @@ class AppStroke {
     // m_pAppRS[m_ReSam-1].idx = m_Sam-1;
     // m_pAppRS[m_ReSam-1].alf = 1.0f;
     }
-
-    sam() {
-      return this.org_points.length/2;
-    }
-
-    draw(points) {
-        let copy_points = this.org_points.concat(points);
-        return new AppStroke(copy_points);
-      }
 
 }
 
