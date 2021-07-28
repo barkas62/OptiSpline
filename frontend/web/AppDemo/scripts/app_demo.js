@@ -121,6 +121,7 @@ StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
       console.log("in mouseUp: stroke length: " + this.state.stroke.org_points.length.toString());
       this.dom.removeEventListener("mouseup", mouseUp);
       this.state.stroke.init_approx(this.state.resam, this.state.ord);
+      this.state.iter = 0;
       drawStroke(this.state.stroke, this.dom, this.state.what2draw);
     };
 
@@ -225,7 +226,7 @@ function draw(pos, state, dispatch) {
     function drawPoint({x, y}, state) {
       let new_pnt = [x, y];
       //console.log("in draw: " + x.toString() + " " + y.toString());
-      dispatch({stroke: state.stroke.draw(new_pnt)});
+      dispatch({iter: 0, stroke: state.stroke.draw(new_pnt)});
     }
     drawPoint(pos, state);
     return drawPoint;
@@ -263,13 +264,13 @@ class StepButton {
   constructor(state, {dispatch}) {
     this.parent_id = "panel-step";
     this.iter = state.iter
-    this.dom = elt("button", { onclick: () => dispatch({iter: this.iter+1}) }, ">" + state.iter.toString());
+    this.dom = elt("button", { onclick: () => dispatch({iter: this.iter+1}) }, "Iterations: " + state.iter.toString());
     document.getElementById(this.parent_id).appendChild(this.dom);
   }
 
   syncState(state) { 
     this.iter = state.iter;
-    this.dom.innerHTML = ">" + this.iter.toString(); }
+    this.dom.innerHTML = "Iterations: " + this.iter.toString(); }
 }
 
 const startState = {
