@@ -218,8 +218,11 @@ class AppDemo {
         state.stroke.init_approx(state.resam, state.ord); 
       }
 
-      if (state.iter > this.state.iter){
-        state.stroke.param_app(state.iter - this.state.iter, -1);
+      if (state.iter != this.state.iter){
+        if (state.iter > this.state.iter)
+          state.stroke.param_app(state.iter - this.state.iter, -1);
+        else
+          state.stroke.init_approx(state.resam, state.ord);
       }
 
       this.state = state;
@@ -277,6 +280,16 @@ class StepButton {
   syncState(state) { 
     this.iter = state.iter;
     this.dom.innerHTML = "Iterations: " + this.iter.toString(); }
+}
+
+class ResetButton {
+  constructor(state, {dispatch}) {
+    this.parent_id = "panel-reset";
+    this.dom = elt("button", { onclick: () => dispatch({iter: 0}) }, "Reset");
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+
+  syncState(state) {}
 }
 
 class ResamInput {
@@ -341,7 +354,8 @@ const baseControls = [
   SamText, 
   ResamInput,
   OrdInput,
-  StepButton 
+  StepButton, 
+  ResetButton 
 ];  
 
 function startAppDemo({state    = startState,
