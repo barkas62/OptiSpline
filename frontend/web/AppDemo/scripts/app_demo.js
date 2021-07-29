@@ -176,7 +176,13 @@ class AppDemo {
     }
 
     syncState(state) {
-      console.log("in AppDemo.syncState: " + state.source); 
+      // console.log("in AppDemo.syncState: " + state.source); 
+      // console.log("resam: " + state.resam.toString());
+      if (state.resam != this.state.resam || state.ord != this.state.ord){
+        state.iter = 0;
+        state.stroke.init_approx(state.resam, state.ord);
+      }
+
       if (state.source != this.state.source){
         // Source changed
         let D = 250.0;
@@ -273,6 +279,51 @@ class StepButton {
     this.dom.innerHTML = "Iterations: " + this.iter.toString(); }
 }
 
+class ResamInput {
+  constructor(state, {dispatch}) {
+    this.parent_id = "panel-resam";
+    this.resam = state.resam
+    this.inp = elt("input", {type: "number", style: "width: 3em", value: this.resam.toString(), 
+                                onchange: () => dispatch({resam: parseInt(this.inp.value)}) });
+    this.dom = elt("label", null, "Resam: ", this.inp);
+
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+
+  syncState(state) { 
+    this.resam = state.resam;
+    this.inp.value = this.resam.toString(); }
+}
+
+class OrdInput {
+  constructor(state, {dispatch}) {
+    this.parent_id = "panel-ord";
+    this.ord = state.ord
+    this.inp = elt("input", {type: "number", style: "width: 3em", value: this.ord.toString(), 
+                                onchange: () => dispatch({ord: parseInt(this.inp.value)}) });
+    this.dom = elt("label", null, "Order: ", this.inp);
+
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+
+  syncState(state) { 
+    this.ord = state.ord;
+    this.inp.value = this.ord.toString(); }
+}
+
+class SetParamsButton {
+  constructor(state, {dispatch}) {
+    this.parent_id = "panel-set-params";
+    this.iter = state.iter
+    this.dom = elt("button", { onclick: () => dispatch({resam: this.iter+1}) }, "Set");
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+
+  syncState(state) { 
+    this.iter = state.iter;
+    this.dom.innerHTML = "Iterations: " + this.iter.toString(); }
+}
+
 const startState = {
   source    : "freehand",
   what2draw : DRAW_SRC | DRAW_APP | DRAW_RSM, 
@@ -288,6 +339,8 @@ const baseSources = ["freehand", "square", "triangle", "lambda"];
 const baseControls = [
   SourceSelect,
   SamText, 
+  ResamInput,
+  OrdInput,
   StepButton 
 ];  
 
