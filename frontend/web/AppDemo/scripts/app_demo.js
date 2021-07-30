@@ -38,7 +38,7 @@ function drawStroke(stroke, canvas, what2draw) {
     canvas.height = 748;
 
     let cx = canvas.getContext("2d");
-    console.log("in drawStroke: what2draw: " + what2draw.toString());
+    //console.log("in drawStroke: what2draw: " + what2draw.toString());
 
     if ((what2draw & DRAW_SRC) && stroke.org_points.length != 0){
       cx.beginPath();
@@ -264,7 +264,7 @@ class SamText{
     document.getElementById(this.parent_id).appendChild(this.dom);
   }
   syncState(state) { 
-    console.log("SamText: stroke length: " + state.stroke.sam().toString());
+    //console.log("SamText: stroke length: " + state.stroke.sam().toString());
     this.dom.innerHTML = "Sam: " + state.stroke.sam().toString();
    }
 }

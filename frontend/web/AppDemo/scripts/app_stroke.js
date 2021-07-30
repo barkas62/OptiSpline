@@ -38,7 +38,9 @@ class AppStroke {
     }
 
     init_approx(resam, ord){
-        if (this.org_points.length == 0)
+        console.log("init_approx: " + this.org_points.length.toString());
+
+        if (this.org_points.length <= 2)
             return;
 
         this.resam = resam;
