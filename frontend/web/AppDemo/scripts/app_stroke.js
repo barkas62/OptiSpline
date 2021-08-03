@@ -24,7 +24,8 @@ class AppStroke {
 
         this.basis = []; 
 
-        this.err = 0.0;
+        this.rms_err = 0.0;
+        this.max_err = 0.0;
         this.lam = 0.0;
     }
 
@@ -73,7 +74,7 @@ class AppStroke {
             this.approx();
             this.app_err();
             this.app_rs = tracing(this.app_points);
-            if (max_err > 0.0 && this.err < max_err)
+            if (max_err > 0.0 && this.max_err < max_err)
                 break;
         }
         
@@ -134,16 +135,20 @@ class AppStroke {
     }
 
     app_err(){
-        this.err  = 0;
+        this.rms_err  = 0.0;
+        this.max_err  = 0.0;
         for (let i = 0; i < this.resam; i++)
         {
             let dx = this.app_points[2*i+0] - this.rsm_points[2*i+0];  
             let dy = this.app_points[2*i+1] - this.rsm_points[2*i+1];
             let de = dx*dx + dy*dy;
      
-           this.err += de;
+            this.rms_err += de;
+            if (de > this.max_err)
+                this.max_err = de;
         }
-        this.err = Math.sqrt(this.err / this.resam);
+        this.rms_err = Math.sqrt(this.rms_err / this.resam);
+        this.max_err = Math.sqrt(this.max_err);
     }
 
     repar(){

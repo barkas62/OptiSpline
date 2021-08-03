@@ -18,11 +18,12 @@ function elt(type, props, ...children) {
   }
   
 class StrokeCanvas {
-    constructor(state, pointerDown) {
+    constructor(state, pointerDown, dispatch) {
         this.dom = elt("canvas", {
             onmousedown: event => this.mouse(event, pointerDown),
             ontouchstart: event => this.touch(event, pointerDown)
         });
+        this.dispatch = dispatch; 
         this.syncState(state);
     }
 
@@ -121,8 +122,8 @@ StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
       console.log("in mouseUp: stroke length: " + this.state.stroke.org_points.length.toString());
       this.dom.removeEventListener("mouseup", mouseUp);
       this.state.stroke.init_approx(this.state.resam, this.state.ord);
-      this.state.iter = 0;
       drawStroke(this.state.stroke, this.dom, this.state.what2draw);
+      this.dispatch({max_err: this.state.stroke.max_err, rms_err: this.state.stroke.rms_err })
     };
 
     this.dom.addEventListener("mousemove", mouseMove);
@@ -166,7 +167,7 @@ class AppDemo {
         pos => {
         let onMove = draw(pos, this.state, dispatch);
         if (onMove) return pos => onMove(pos, this.state);
-      });
+      }, dispatch);
       
       console.log("Setting controls");
       this.controls = controls.map( Control => new Control(state, config) );
@@ -181,6 +182,8 @@ class AppDemo {
       if (state.resam != this.state.resam || state.ord != this.state.ord){
         state.iter = 0;
         state.stroke.init_approx(state.resam, state.ord);
+        state.max_err = state.stroke.max_err;
+        state.rms_err = state.stroke.rms_err;
       }
 
       if (state.source != this.state.source){
@@ -219,10 +222,17 @@ class AppDemo {
       }
 
       if (state.iter != this.state.iter){
-        if (state.iter > this.state.iter)
+        if (state.iter > this.state.iter){
           state.stroke.param_app(state.iter - this.state.iter, -1);
+          state.max_err = state.stroke.max_err;
+          state.rms_err = state.stroke.rms_err;
+        }
         else
+        {
           state.stroke.init_approx(state.resam, state.ord);
+          state.max_err = state.stroke.max_err;
+          state.rms_err = state.stroke.rms_err;
+        }
       }
 
       this.state = state;
@@ -264,8 +274,29 @@ class SamText{
     document.getElementById(this.parent_id).appendChild(this.dom);
   }
   syncState(state) { 
-    //console.log("SamText: stroke length: " + state.stroke.sam().toString());
     this.dom.innerHTML = "Sam: " + state.stroke.sam().toString();
+   }
+}
+
+class MaxErrText{
+  constructor(state, {stroke, dispatch}){
+    this.parent_id = "panel-max-err";
+    this.dom = elt("p", null, "Max Error: N/a");
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+  syncState(state) { 
+    this.dom.innerHTML = "Max Error: " + state.max_err.toFixed(2).toString();
+   }
+}
+
+class RmsErrText{
+  constructor(state, {stroke, dispatch}){
+    this.parent_id = "panel-rms-err";
+    this.dom = elt("p", null, "RMS Error: N/a");
+    document.getElementById(this.parent_id).appendChild(this.dom);
+  }
+  syncState(state) { 
+    this.dom.innerHTML = "RMS Error: " + state.rms_err.toFixed(2).toString();
    }
 }
 
@@ -341,7 +372,8 @@ const startState = {
   source    : "freehand",
   what2draw : DRAW_SRC | DRAW_APP | DRAW_RSM, 
   iter      : 0,
-  err       : 0,
+  rms_err   : 0,
+  max_err   : 0,
   resam     : 32,
   ord       : 9,
   stroke: new AppStroke([])
@@ -355,8 +387,11 @@ const baseControls = [
   ResamInput,
   OrdInput,
   StepButton, 
-  ResetButton 
+  ResetButton,
+  MaxErrText,
+  RmsErrText 
 ];  
+
 
 function startAppDemo({state    = startState,
                        sources  = baseSources,

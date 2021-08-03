@@ -96,11 +96,11 @@
     grid-column: 2;
   }
 
-  .approx-grid-panel-err {
+  .approx-grid-panel-rms-err {
     grid-row: 3;
     grid-column: 1;
   }
-  .approx-grid-panel-lam {
+  .approx-grid-panel-max-err {
     grid-row: 3;
     grid-column: 2;
   }
