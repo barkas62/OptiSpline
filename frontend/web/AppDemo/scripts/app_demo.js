@@ -1,7 +1,3 @@
-const DRAW_SRC = 1
-const DRAW_APP = 2
-const DRAW_RSM = 4
-
 function updateState(state, action) {
     return Object.assign({}, state, action);
   }
@@ -30,18 +26,18 @@ class StrokeCanvas {
     syncState(state) {
       this.state = state;
 
-      drawStroke(this.state.stroke, this.dom, this.state.what2draw);
+      drawStroke(this.state.stroke, this.dom, this.state.draw_src, this.state.draw_app, this.state.draw_rsm, this.state.draw_bez);
     }
 }
 
-function drawStroke(stroke, canvas, what2draw) {
+function drawStroke(stroke, canvas, draw_src, draw_app, draw_rsm, draw_bez) {
     canvas.width  = 748;
     canvas.height = 748;
 
     let cx = canvas.getContext("2d");
     //console.log("in drawStroke: what2draw: " + what2draw.toString());
 
-    if ((what2draw & DRAW_SRC) && stroke.org_points.length != 0){
+    if (draw_src && stroke.org_points.length != 0){
       cx.beginPath();
       let x0 = stroke.org_points[0];
       let y0 = stroke.org_points[1];
@@ -56,7 +52,7 @@ function drawStroke(stroke, canvas, what2draw) {
       cx.stroke();
     }
 
-    if ((what2draw & DRAW_APP) && stroke.app_points.length != 0){
+    if (draw_app && stroke.app_points.length != 0){
       cx.beginPath();
       let x0 = stroke.app_points[0];
       let y0 = stroke.app_points[1];
@@ -71,21 +67,10 @@ function drawStroke(stroke, canvas, what2draw) {
       cx.stroke();
     }
 
-    if ((what2draw & DRAW_RSM) && stroke.rsm_points.length != 0){
+    if (draw_rsm && stroke.rsm_points.length != 0){
       for (let i = 0; i < stroke.rsm_points.length; i++) {
           let x = stroke.rsm_points[2*i+0];
           let y = stroke.rsm_points[2*i+1];
-          cx.beginPath();
-          cx.arc(x, y, 1, 0, 2*Math.PI, false);
-          cx.strokeStyle = "black";
-          cx.stroke();
-      }
-    }
-
-    if((what2draw & DRAW_RSM) && stroke.app_points.length != 0){
-      for (let i = 0; i < stroke.app_points.length; i++) {
-          let x = stroke.app_points[2*i+0];
-          let y = stroke.app_points[2*i+1];
           cx.beginPath();
           cx.arc(x, y, 1, 0, 2*Math.PI, false);
           cx.strokeStyle = "black";
@@ -122,7 +107,7 @@ StrokeCanvas.prototype.mouse = function(downEvent, onDown) {
       console.log("in mouseUp: stroke length: " + this.state.stroke.org_points.length.toString());
       this.dom.removeEventListener("mouseup", mouseUp);
       this.state.stroke.init_approx(this.state.resam, this.state.ord);
-      drawStroke(this.state.stroke, this.dom, this.state.what2draw);
+      drawStroke(this.state.stroke, this.dom, this.state.draw_src, this.state.draw_app, this.state.draw_rsm, this.state.draw_bez);
       this.dispatch({max_err: this.state.stroke.max_err, rms_err: this.state.stroke.rms_err })
     };
 
@@ -177,7 +162,7 @@ class AppDemo {
     }
 
     syncState(state) {
-      // console.log("in AppDemo.syncState: " + state.source); 
+      //console.log("in AppDemo.syncState: draw_src: " + state.draw_src.toString()); 
       // console.log("resam: " + state.resam.toString());
       if (state.resam != this.state.resam || state.ord != this.state.ord){
         state.iter = 0;
@@ -368,9 +353,51 @@ class SetParamsButton {
     this.dom.innerHTML = "Iterations: " + this.iter.toString(); }
 }
 
+class SrcCheckbox {
+  constructor(state, {dispatch}) {
+    this.parent_id = "panel-draw-src";
+    this.checked = true;
+    this.chk = document.getElementById("draw-src-chk") 
+    Object.assign(this.chk, { onchange: () => dispatch({draw_src: !this.checked}) });
+  }
+
+  syncState(state) { 
+    this.checked = state.draw_src;
+    }
+}
+
+class AppCheckbox {
+  constructor(state, {dispatch}) {
+    this.parent_id = "panel-draw-app";
+    this.checked = true;
+    this.chk = document.getElementById("draw-app-chk") 
+    Object.assign(this.chk, { onchange: () => dispatch({draw_app: !this.checked}) });
+  }
+
+  syncState(state) { 
+    this.checked = state.draw_app;
+    }
+}
+
+class RsmCheckbox {
+  constructor(state, {dispatch}) {
+    this.parent_id = "panel-draw-rsm";
+    this.checked = true;
+    this.chk = document.getElementById("draw-rsm-chk") 
+    Object.assign(this.chk, { onchange: () => dispatch({draw_rsm: !this.checked}) });
+  }
+
+  syncState(state) { 
+    this.checked = state.draw_rsm;
+    }
+}
+
 const startState = {
   source    : "freehand",
-  what2draw : DRAW_SRC | DRAW_APP | DRAW_RSM, 
+  draw_src  : true,
+  draw_app  : true,
+  draw_rsm  : true,
+  draw_bez  : false,  
   iter      : 0,
   rms_err   : 0,
   max_err   : 0,
@@ -389,7 +416,10 @@ const baseControls = [
   StepButton, 
   ResetButton,
   MaxErrText,
-  RmsErrText 
+  RmsErrText,
+  SrcCheckbox, 
+  AppCheckbox,
+  RsmCheckbox 
 ];  
 
 
