@@ -37,19 +37,22 @@
 
         <div class="app-grid-panel-show">
             <div class="show-grid">
+                <div class="show-grid-panel-head" id = "panel-draw-head">
+                    Show:
+                </div>
                 <div class="show-grid-panel-src" id = "panel-draw-src">
                     <label>
-                        <input type="checkbox" id="draw-src-chk" checked> Draw Src
+                        <input type="checkbox" id="draw-src-chk" checked> Source
                     </label>
                 </div>
                 <div class="show-grid-panel-app" id = "panel-draw-app">
                     <label>
-                        <input type="checkbox" id="draw-app-chk" checked> Draw App
+                        <input type="checkbox" id="draw-app-chk" checked> Approximation
                     </label>
                 </div>
                 <div class="show-grid-panel-rsm" id = "panel-draw-rsm">
                     <label>
-                        <input type="checkbox" id="draw-rsm-chk" checked> Draw Rsm
+                        <input type="checkbox" id="draw-rsm-chk" checked> Sampling points
                     </label>
                 </div>
                 <div class="show-grid-panel-bez" id = "panel-draw-bez">
@@ -57,7 +60,12 @@
                 </div>
             </div>    
         </div>
+        <div class="app-grid-panel-info" id = "panel-info">
+
+        </div>
     </div>
+
+
 
     <script>
         document.getElementById("canvas-placeholder").appendChild(startAppDemo({}));

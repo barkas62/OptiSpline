@@ -24,6 +24,9 @@ class AppStroke {
 
         this.basis = []; 
 
+        this.resam = 0;
+        this.ord   = 0;
+
         this.rms_err = 0.0;
         this.max_err = 0.0;
         this.lam = 0.0;
@@ -45,7 +48,7 @@ class AppStroke {
             return;
 
         this.resam = resam;
-        this.ord   = ord;
+        this.ord   = ord + 1;
 
         this.org_rs = tracing(this.org_points);
 

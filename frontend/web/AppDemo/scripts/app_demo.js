@@ -255,11 +255,11 @@ class SourceSelect {
 class SamText{
   constructor(state, {stroke, dispatch}){
     this.parent_id = "panel-sam";
-    this.dom = elt("p", null, "Sam: " + state.stroke.sam().toString());
+    this.dom = elt("p", null, "Points in stroke: " + state.stroke.sam().toString());
     document.getElementById(this.parent_id).appendChild(this.dom);
   }
   syncState(state) { 
-    this.dom.innerHTML = "Sam: " + state.stroke.sam().toString();
+    this.dom.innerHTML = "Points in stroke: " + state.stroke.sam().toString();
    }
 }
 
@@ -392,6 +392,53 @@ class RsmCheckbox {
     }
 }
 
+class InfoText{
+  constructor(state, {stroke, dispatch}){
+    this.parent_id = "panel-info";
+    this.dom = elt("p", null, "");
+    document.getElementById(this.parent_id).appendChild(this.dom);
+    if (state.source == "freehand")
+      this.dom.innerHTML = "Draw a single stroke you want to approximate.<br><br>Or select a predefined shape from the <b>Source</b> drop-down list.";
+    else
+      this.dom.innerHTML = "Click <b>Iterations</b> button. <br> Or change the number of sampling points (<b>Resam</b>), or approximation order (<b>Order</b>)";
+  }
+  syncState(state) { 
+    let info = "";
+    if (state.iter == 0){
+      if (state.source == "freehand")
+        if (state.stroke.sam() == 0)
+          info = "Draw a single stroke you want to approximate.<br>Or select a predefined shape from a Source drop-down list.";
+        else
+          if (state.stroke.resam == 0)
+            info = "";
+          else 
+          info = init_info;
+      else 
+        info = init_info;
+    }
+    else{
+      info = iter_info;
+    }
+    this.dom.innerHTML = info;
+   }
+}
+
+const init_info = `
+You see the initial approximation (red line).<br> 
+Sampling points are distributed equidistantly along the stroke (black dots).<br>
+The number of sampling points is defined by <b>Resam</b> value.<br>
+The stroke is approximated by cosine polynomials, the order of approximation is defined by <b>Order</b> value.<br>   
+Approximation quality: <b>RMS Error</b> and <b>Max Error.</b> <br><br>
+Click <b>Iterations</b> button. <br><br> 
+You may change the number of sampling points (<b>Resam</b>), or approximation order (<b>Order</b>).<br>
+`;
+
+const iter_info = `
+Continue Iterations. See how approximation is improving and both <b>RMS Error</b> and <b>Max Error</b> are decreasing.<br><br>
+Clicking <b>Reset</b> button restarts approximating iterations.<br>
+Changing <b>Resam</b> or <b>Order</b> also restarts approximation with new parameters.
+`
+
 const startState = {
   source    : "freehand",
   draw_src  : true,
@@ -419,7 +466,8 @@ const baseControls = [
   RmsErrText,
   SrcCheckbox, 
   AppCheckbox,
-  RsmCheckbox 
+  RsmCheckbox,
+  InfoText 
 ];  
 
 
