@@ -128,6 +128,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist ..\..\..\..\..\bin\win\lib\x86\c\ (
+  mkdir  ..\..\..\..\..\bin\win\lib\x86\c\
+); 
+copy $(OutDir)$(TargetName)$(TargetExt) ..\..\..\..\..\bin\win\lib\x86\c\</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
