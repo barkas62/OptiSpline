@@ -2,279 +2,219 @@
 
 #include <memory.h>
 #include <math.h>
+#include <malloc.h>
 
 #include "Stroke.h"
 
-void Stroke::Init( int Dim, int Sam )
+ERR_CODE Stroke_AddPoint(STROKE* pS, INT Dim, FLOAT* pPnt);
+
+ERR_CODE Stroke_Init(STROKE* pS, int Dim, int Sam)
 {
-	Clear();
+	FLOAT  * pOrg   = NULL;
+	RSDATA * pOrgRS = NULL;
 
-	m_pOrg   =  new float  [Dim * Sam];
-	m_pOrgRS =  new _RSDATA[      Sam];
+	if (pS == NULL)
+		return err_code_ZERO_POINTER_PASSED;
 
-	if( m_pOrg  != 0  && m_pOrgRS  != 0 )
+	if (Dim <= 1 || Sam <= 0)
+		return err_code_WRONG_PARAMETER;
+
+	Stroke_Clear(pS);
+
+	pOrg   = (FLOAT *)malloc( Dim*Sam*sizeof(FLOAT) );
+	pOrgRS = (RSDATA*)malloc( Sam*sizeof(RSDATA) );
+
+	if (pOrg == NULL || pOrgRS == NULL)
 	{
-		m_Dim = Dim;
-
-		m_MaxSam = Sam;
-		memset( m_pOrg  , 0, Dim*m_MaxSam*sizeof(float)   );
-		memset( m_pOrgRS, 0,     m_MaxSam*sizeof(_RSDATA) );
-	}
-}
-
-
-Stroke::Stroke( Stroke& S )
-{
-	m_Dim =  S.m_Dim;
-	if( m_Dim == 0 )
-		return;
-
-	if (S.m_MaxSam > 0)
-	{
-		m_pOrg   = new float[m_Dim * S.m_MaxSam];
-		m_pOrgRS = new _RSDATA[S.m_MaxSam];
-		m_MaxSam = S.m_MaxSam;
-		memset(m_pOrg, 0, m_Dim * m_MaxSam * sizeof(float));
-		memset(m_pOrgRS, 0, m_MaxSam * sizeof(_RSDATA));
+		if (pOrg != NULL)
+			free(pOrg);
+		if (pOrgRS != NULL)
+			free(pOrgRS);
+		return err_code_OUT_OF_MEMORY;
 	}
 
+	memset(pOrg,   0, Dim* Sam*sizeof(float) );
+	memset(pOrgRS, 0,      Sam*sizeof(RSDATA));
 
-	if (S.m_Sam > 0)
+	pS->m_pOrg   = pOrg;
+	pS->m_pOrgRS = pOrgRS;
+
+	pS->m_Dim    = Dim;
+	pS->m_MaxSam = Sam;
+	pS->m_Sam    = 0;
+
+	return err_code_OK;
+}
+
+ERR_CODE Stroke_ZeroInit(STROKE* pS)
+{
+	if (pS == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+
+	pS->m_Dim = 0;
+	pS->m_Sam = 0;
+	pS->m_MaxSam = 0;
+
+
+	pS->m_pOrg   = NULL;
+	pS->m_pOrgRS = NULL;
+
+	return err_code_OK;
+}
+
+
+ERR_CODE Stroke_Clear(STROKE* pS)
+{
+	if (pS == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+
+	if( pS->m_pOrg != NULL )
+		free( pS->m_pOrg );
+
+	if( pS->m_pOrgRS != 0 )
+		free( pS->m_pOrgRS );
+
+	return Stroke_ZeroInit(pS);
+}
+
+ERR_CODE Stroke_Resize(STROKE* pS, INT MaxSam)
+{
+	FLOAT  * pOrg   = NULL;
+	RSDATA * pOrgRS = NULL;
+
+	if (pS == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+
+	if (MaxSam <= 0)
+		return err_code_WRONG_PARAMETER;
+
+	if (MaxSam <= pS->m_MaxSam)
+		return err_code_OK;
+
+	if (pS->m_Dim <= 1)
+		return err_code_BAD_STRUCTURE_CONTENT;
+
+	pOrg   = (FLOAT *)malloc(pS->m_Dim * MaxSam * sizeof(FLOAT));
+	pOrgRS = (RSDATA*)malloc(MaxSam * sizeof(RSDATA));
+
+	if (pOrg == NULL || pOrgRS == NULL)
 	{
-		m_Sam = S.m_Sam;
-		memcpy(m_pOrg,   S.m_pOrg,   m_Dim*m_Sam*sizeof(float));
-		memcpy(m_pOrgRS, S.m_pOrgRS, m_Sam*sizeof(_RSDATA));
+		if (pOrg != NULL)
+			free(pOrg);
+		if (pOrgRS != NULL)
+			free(pOrgRS);
+
+		return err_code_OUT_OF_MEMORY;
 	}
 
-}
+	memset( pOrg, 0, pS->m_Dim*MaxSam*sizeof(float) );
 
-Stroke::~Stroke()
-{
-	if( m_pOrg != 0 )
-		delete m_pOrg;
-
-	if( m_pOrgRS != 0 )
-		delete m_pOrgRS;
-}
-
-void Stroke::Resize( int MaxSam, bool bCopy )
-{
-	if( MaxSam <= m_MaxSam )
-		return;
-
-	float  * pOrg   = new float  [m_Dim * MaxSam];
-	memset( pOrg, 0, m_Dim*MaxSam*sizeof(float) );
-	if( m_pOrg != 0 )
+	if (pS->m_pOrg != 0  && pS->m_Sam >= 1)
 	{
-		if( bCopy )
-			memcpy( pOrg, m_pOrg, m_Dim* m_Sam*sizeof(float) );
-
-		delete  m_pOrg;
+		memcpy( pOrg, pS->m_pOrg, pS->m_Dim* pS->m_Sam*sizeof(float) );
+		free(pS->m_pOrg);
 	}
-	m_pOrg = pOrg;
+	pS->m_pOrg = pOrg;
 
-	p_RSDATA pOrgRS = new _RSDATA[        MaxSam];
-	memset( pOrgRS,        0, MaxSam*sizeof(_RSDATA) );
+	memset( pOrgRS,  0, MaxSam*sizeof(RSDATA) );
 
-	if( m_pOrgRS != 0 )
+	if (pS->m_pOrgRS != 0 && pS->m_Sam >= 1)
 	{
-		if( bCopy )
-			memcpy( pOrgRS, m_pOrgRS,  m_Sam*sizeof(_RSDATA) );
-
-		delete  m_pOrgRS;
+		memcpy( pOrgRS, pS->m_pOrgRS, pS->m_Sam*sizeof(RSDATA) );
+		free(pS->m_pOrgRS);
 	}
-	m_pOrgRS = pOrgRS;
+	pS->m_pOrgRS = pOrgRS;
 
-	m_MaxSam = MaxSam;
+	pS->m_MaxSam = MaxSam;
+
+	return err_code_OK;
 }
 
-void Stroke::Clear()
+ERR_CODE Stroke_AddPoints(STROKE *pS, INT Dim, INT nPoints, FLOAT* pPoints)
 {
-	if( m_pOrg != 0   )
-		delete m_pOrg;
+	INT i;
+	ERR_CODE err_code = err_code_OK;
+	FLOAT* pPnt = NULL;
 
-	if( m_pOrgRS != 0 )
-		delete m_pOrgRS;
-
-	m_Dim    =  0;
-	m_Sam    =  0;
-	m_MaxSam = -1;
-
-	m_pOrg   =  0;
-	m_pOrgRS =  0;
-}
-
-bool  Stroke::GetAt( int Idx, int *pX )
-{
-	if( Idx > m_Sam-1 || pX == 0 )
-		return false;
-
-	float * pCur = m_pOrg + m_Dim*Idx;
-
-	for( int k = 0; k < m_Dim; k++, pCur++, pX++ )
-		pX[0] = (int)pCur[0];
-
-	return true;
-}
-
-bool  Stroke::GetAt( int Idx, float *pX )
-{
-	if( Idx > m_Sam-1 || pX == 0 )
-		return false;
-
-	float * pCur = m_pOrg + m_Dim*Idx;
-
-	for( int k = 0; k < m_Dim; k++, pCur++, pX++ )
-		pX[0] = pCur[0];
-
-	return true;
-}
-
-bool  Stroke::GetAt( int Idx, float *pX, float *pY, float *pZ )
-{
-	if( Idx > m_Sam-1 )
-		return false;
-
-	float * pCur = m_pOrg + m_Dim*Idx;
-
-	*pX = pCur[0];
-	*pY = pCur[1];
-	if( pZ != 0 )
-	   *pZ = pCur[2];
-
-	return   true;
-}
-
-bool  Stroke::GetAt( int Idx, int *pX, int *pY, int *pZ )
-{
-	if( Idx > m_Sam-1 )
-		return false;
-
-	float * pCur = m_pOrg + m_Dim*Idx;
-
-	*pX = (int)pCur[0];
-	*pY = (int)pCur[1];
-	if( pZ != 0 )
-	   *pZ = (int)pCur[2];
-
-	return true;
-}
-
-void  Stroke::Add( float x, float y )
-{
-	if( m_Dim != 2 )
-		return;
-
-	if( m_Sam >= m_MaxSam )
-		Resize( m_MaxSam + 128 );
-
-	float * pCur = m_pOrg + m_Dim*m_Sam;
-	pCur[0] = x;
-	pCur[1] = y;
-
-	if( m_Sam > 0 )
-	{
-		pCur -= m_Dim;
-		float  dx = x  - pCur[0]; 
-		float  dy = y  - pCur[1]; 
-		float  ds = (float)sqrt( dx*dx + dy*dy );
-		m_pOrgRS[m_Sam].s = ds;
-		m_pOrgRS[m_Sam].r = m_pOrgRS[m_Sam-1].r + ds;
-	}
+	if (pS == NULL || pPoints == NULL)
+		return err_code_ZERO_POINTER_PASSED;
 		
-	m_Sam++;
-}
+	if (pS->m_Dim != Dim || Dim == 0 || nPoints <= 0)
+		return err_code_WRONG_PARAMETER;
 
-void  Stroke::Add( int x, int y )
-{
-	Add( (float)x, (float)y );
-}
-
-void  Stroke::Add( float x, float y, float z )
-{
-	if( m_Dim != 3 )
-		return;
-
-	if( m_Sam >= m_MaxSam )
-		Resize( m_MaxSam + 128 );
-
-	float * pCur = m_pOrg + m_Dim*m_Sam;
-	pCur[0] = x;
-	pCur[1] = y;
-	pCur[2] = z;
-
-	if( m_Sam > 0 )
+	if (pS->m_Sam + nPoints > pS->m_MaxSam)
 	{
-		pCur -= m_Dim;
-		float  dx = x  - pCur[0]; 
-		float  dy = y  - pCur[1]; 
-		float  dz = z  - pCur[2]; 
-		float  ds = (float)sqrt( dx*dx + dy*dy + dz*dz );
-		m_pOrgRS[m_Sam].s = ds;
-		m_pOrgRS[m_Sam].r = m_pOrgRS[m_Sam-1].r + ds;
-	}
-		
-	m_Sam++;
-}
-
-void  Stroke::Add( int x, int y, int z )
-{
-	Add( (float)x, (float)y, (float)z );
-}
-
-bool  Stroke::Add( int Dim, float * pX )
-{
-	int k;
-
-	if( m_Dim != Dim || pX == 0 )
-		return false;
-
-	if( m_Sam >= m_MaxSam )
-		Resize( m_MaxSam + 128 );
-
-	float * pCur = m_pOrg + m_Dim*m_Sam;
-
-	for( k = 0; k < m_Dim; k++ )
-		pCur[k] = pX[k];
-
-	if( m_Sam > 0 )
-	{
-		pCur -= m_Dim;
-
-		float  ds = 0.0f;
-		for( k =0; k < m_Dim; k++ )
+		err_code = Stroke_Resize(pS, pS->m_Sam + nPoints);
+		if (err_code != err_code_OK) 
 		{
-			float  d = pCur[k+m_Dim]  - pCur[k]; 
-			ds += d* d;
+			Stroke_Clear(pS);
+			return err_code;
 		}
-		ds = (float)sqrt( ds );
 
-		m_pOrgRS[m_Sam].s = ds;
-		m_pOrgRS[m_Sam].r = m_pOrgRS[m_Sam-1].r + ds;
 	}
-		
-	m_Sam++;
 
-	return true;
-}
-
-void  Stroke::Tracing()
-{
-	float  dl = m_pOrgRS[0].s = m_pOrgRS[0].r = 0.0f;
-
-	float  * pA  = m_pOrg;
-	p_RSDATA pRS = m_pOrgRS + 1;
-	for( int i = 1; i < m_Sam; i++, pRS++ )
+	pPnt = pPoints;
+	for (i = 0; i < nPoints; i++, pPnt += Dim)
 	{
-		double  ds = 0.0;
-		for( int k = 0; k < m_Dim; k++, pA++ )
-		{
-			float dx = pA[m_Dim] - pA[0];
-			ds += dx * dx;
-		}
-		ds     = sqrt(  ds );
-		pRS->s = (float)ds;
-		pRS->r = (pRS-1)->r + (float)ds;
-   }
+		err_code = Stroke_AddPoint(pS, Dim, pPnt);
+		if (err_code != err_code_OK)
+			break;
+	}
+
+	return  err_code;
 }
+
+ERR_CODE Stroke_AddPoint(STROKE* pS, INT Dim, FLOAT* pPnt)
+{
+	ERR_CODE err_code = err_code_OK;
+
+	INT k = 0;
+	FLOAT* pLastPnt = NULL;
+	FLOAT ds = (FLOAT)0.0;
+	FLOAT d  = (FLOAT)0.0;
+	RSDATA* pRS = NULL;
+
+	if (pS == NULL || pPnt == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+	if (Dim == 0 || Dim != pS->m_Dim)
+		return err_code_WRONG_PARAMETER;
+
+	if (pS->m_Sam >= pS->m_MaxSam)
+	{
+		err_code = Stroke_Resize(pS, pS->m_Sam + 128);
+		if (err_code != err_code_OK)
+			return err_code;
+	}
+
+	if (pS->m_Sam == 0)
+	{
+		memcpy(pS->m_pOrg, pPnt, Dim * sizeof(FLOAT));
+		pS->m_pOrgRS->r = pS->m_pOrgRS->s = (FLOAT)0.0;
+		pS->m_Sam = 1;
+	}
+	else
+	{
+		pLastPnt = pS->m_pOrg + pS->m_Dim*(pS->m_Sam-1);
+		ds = (FLOAT)0.0;
+		for (k = 0; k < Dim; k++)
+		{
+			d = pPnt[k] - pLastPnt[k];
+			ds += d * d;
+		}
+		if (ds > ZERO_PRECISION)
+		{ // New point differs from the last one
+			ds = (FLOAT)sqrt(ds);
+			memcpy(pLastPnt + Dim, pPnt, Dim*sizeof(FLOAT));
+			
+			pRS = pS->m_pOrgRS + (pS->m_Sam-1);
+			pRS[1].s = ds;
+			pRS[1].r = pRS[0].r + ds;
+			pS->m_Sam += 1;
+		}
+	}
+
+	return err_code;
+}
+
+
 

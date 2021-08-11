@@ -1,35 +1,19 @@
-// Basis.h: interface for the Basis class.
-//
-//////////////////////////////////////////////////////////////////////
+#ifndef _BASIS_H_INCLUDED_
+#define _BASIS_H_INCLUDED_
 
-#if !defined(AFX_BASIS_H__1536C284_C445_11D1_B2F6_006008332431__INCLUDED_)
-#define AFX_BASIS_H__1536C284_C445_11D1_B2F6_006008332431__INCLUDED_
+#include "types.h"
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
+typedef struct{
+	INT		m_Ord; 
+	INT		m_ReSam; 
 
-class  AppStroke;
+	FLOAT * m_pBasis;
+	FLOAT * m_pNorms;
+} BASIS;
 
-class Basis  
-{
-public:
-	int		m_Ord; 
-	int		m_ReSam; 
-	float * m_pBasis;
 
-	float * m_pNorms;
+ERR_CODE Basis_ZeroInit(BASIS* pB);
+ERR_CODE Basis_Init    (BASIS* pB, INT Ord, INT ReSam);
+ERR_CODE Basis_Clear   (BASIS* pB);
 
-public:
-	Basis();
-	Basis( const Basis& Bas );
-	virtual ~Basis();
-
-	void    Init ( int Ord, int ReSam );
-	void    ClearBasis();
-	void	CosBasis  ();
-	void    CosBasis( int ReSam0 );
-	void    Norm      ();
-};
-
-#endif // !defined(AFX_BASIS_H__1536C284_C445_11D1_B2F6_006008332431__INCLUDED_)
+#endif

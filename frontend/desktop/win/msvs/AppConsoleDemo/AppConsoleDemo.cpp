@@ -4,7 +4,9 @@
 #include <iostream>
 #include <chrono>
 
-#include "AppStroke.h"
+#include "cplusplus\AppStroke.h"
+#include "c\AppStroke.h"
+
 
 using namespace std::chrono;
 
@@ -29,18 +31,20 @@ int main()
 
     int Dim   = 2;    // 2-dimensional stroke  
     int Sam   = 5;    // number of original sampling points (vertexes)
-    int ReSam = 32;   // Number of re-sampling points for approximation
-    int Ord   = 11;    // Approximation order 
+    int ReSam = 64;   // Number of re-sampling points for approximation
+    int Ord   = 11;   // Approximation order 
 
     std::cout << "Approximation parameters: " << std::endl;
     std::cout << "ReSam = " << ReSam << std::endl;
     std::cout << "Ord = " << Ord << std::endl << std::endl;
 
+    std::cout << std::endl << "========= Using C++ Library ===========" << std::endl;
+
     AppStrk.Init(Dim, Sam, Ord, ReSam, quadStroke);
 
     std::cout << "Initial Approximation Error: " << AppStrk.GetErr() << std::endl;
 
-    int  nItr = 64;
+    int  nItr = 6400;
 
     auto start = high_resolution_clock::now();
 
@@ -54,6 +58,55 @@ int main()
     std::cout << "Approximation Error after " << nItr << " iterations: " << Err << std::endl;
     std::cout << "Approximation time: " << duration.count() << " microseconds" << std::endl;
 
+    std::cout << std::endl << "========= Using C Library ===========" << std::endl;
+
+    FLOAT dc = 300.0;
+    FLOAT quadStrokeC[10] =
+    {
+        //    vertexes  
+        0.0,  0.0,  // (left,  upper)
+        dc,   0.0,  // (right, upper)
+        dc,   dc,   // (right, down)
+        0.0,  dc,   // (left,  down)
+        0.0,  0.0   // (left,  upper)
+    };
+
+    ERR_CODE err_code = err_code_OK;
+
+    hAPPSTROKE hAppStrk = AppStroke_Create();
+
+    err_code = AppStroke_Init(hAppStrk, Dim, Ord, ReSam, Sam, quadStrokeC);
+    if(err_code != err_code_OK)
+    {
+        std::cout << "AppStroke_ZeroInit Failed! Error code: " << err_code << std::endl;
+        std::cout << std::endl << "Press <Enter> to exit..." << std::endl;
+        std::cin.get();
+        return (int)err_code;
+    }
+
+    std::cout << "Initial Approximation Error C: " << AppStroke_GetRSMError(hAppStrk) << std::endl;
+
+    auto startC = high_resolution_clock::now();
+
+    err_code = AppStroke_ParamApp(hAppStrk, nItr, -1.0, NULL);
+    if (err_code != err_code_OK)
+    {
+        std::cout << "AppStroke_ParamApp Failed! Error code: " << err_code << std::endl;
+        std::cout << std::endl << "Press <Enter> to exit..." << std::endl;
+        std::cin.get();
+        return (int)err_code;
+    }
+
+    auto stopC = high_resolution_clock::now();
+    auto durationC = duration_cast<microseconds>(stopC - startC);
+
+    std::cout << "Approximation Error after " << nItr << " iterations: " << AppStroke_GetRSMError(hAppStrk) << std::endl;
+    std::cout << "Approximation time: " << durationC.count() << " microseconds" << std::endl;
+
+    AppStroke_Delete(hAppStrk);
+
     std::cout << std::endl << "Press <Enter> to exit..." << std::endl;
     std::cin.get();
+
+    return 0;
 }

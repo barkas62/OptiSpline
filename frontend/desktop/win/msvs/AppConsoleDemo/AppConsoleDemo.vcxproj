@@ -90,13 +90,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\..\lib\src\cplusplus\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib\src\;..\..\..\..\..\lib\src\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\..\lib\builds\win\msvs\AppStroke\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>AppStroke.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\..\lib\builds\win\msvs\AppStrokeC\$(Configuration);..\..\..\..\..\lib\builds\win\msvs\AppStroke\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>AppStroke.lib;AppStrokeC.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -108,16 +108,20 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\..\lib\src\cplusplus\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib\src\;..\..\..\..\..\lib\src\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\..\..\lib\builds\win\msvs\AppStroke\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>AppStroke.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\..\lib\builds\win\msvs\AppStrokeC\$(Configuration);..\..\..\..\..\lib\builds\win\msvs\AppStroke\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>AppStroke.lib;AppStrokeC.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <HeapReserveSize>
+      </HeapReserveSize>
+      <HeapCommitSize>
+      </HeapCommitSize>
     </Link>
     <PostBuildEvent>
       <Command>if not exist ..\..\..\..\..\bin\win\demos\x86\AppConsoleDemo\ (

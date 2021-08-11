@@ -1,458 +1,463 @@
-#include "AppStroke.h"
 #include <math.h>
 #include <memory.h>
+#include <malloc.h>
+#include "AppStroke.h"
 
+#include "Stroke.h"
+#include "Basis.h"
 
-void AppStroke::Clear()
+typedef struct
 {
-	if (m_pApp != 0)
-		delete m_pApp;
-	if (m_pRsm != 0)
-		delete m_pRsm;
-	if (m_pBck != 0)
-		delete m_pBck;
+	INT     m_ReSam;
 
-	if (m_pCfs != 0)
-		delete m_pCfs;
+	FLOAT* m_pApp;
+	FLOAT* m_pRsm;
 
-	if (m_pAppRS != 0)
-		delete m_pAppRS;
+	FLOAT* m_pCfs;
 
-	m_ReSam = 0;
-	m_pApp = 0;
-	m_pRsm = 0;
-	m_pBck = 0;
-	m_pCfs = 0;
+	RSDATA* m_pAppRS;
 
-	m_Err = -1.0f;
-	m_Lam = -1.0f;
+	FLOAT   m_Lam;
+	FLOAT   m_RMSErr;
+	FLOAT   m_MaxErr;
 
-	m_pAppRS = 0;
+	BASIS   m_Basis;
+	STROKE  m_Stroke;
+} APPSTROKE;
 
-	Stroke::Clear();
+VOID AppStroke_ZeroInit(APPSTROKE* pAS);
+VOID AppStroke_Clear   (APPSTROKE* pAS);
+
+FLOAT  AppStroke_Repar(INT Dim, INT Sam, FLOAT* pOrg, RSDATA* pOrgRS,
+	INT ReSam, FLOAT* pRsm, FLOAT* pApp, RSDATA* pAppRS);
+
+VOID AppStroke_Approx(INT Dim, INT ReSam, FLOAT* pRsm, FLOAT* pApp,
+	INT Ord, FLOAT* pBasis, FLOAT* pCfs);
+
+FLOAT AppStroke_AppErr(INT Dim, INT ReSam, FLOAT* pRsm, FLOAT* pApp, FLOAT* pMaxErr);
+
+VOID AppStroke_Tracing(INT Dim, INT ReSam, FLOAT* pApp, RSDATA* pAppRS);
+
+hAPPSTROKE AppStroke_Create()
+{
+	APPSTROKE* pAS = malloc(sizeof(APPSTROKE));
+	if (pAS != NULL);
+		AppStroke_ZeroInit(pAS);
+
+	return (hAPPSTROKE)pAS;
 }
 
-void AppStroke::Init( int Dim, int Sam, int Ord, int ReSam, float * pPnt) 
+VOID AppStroke_Delete(hAPPSTROKE hAS)
 {
-	Clear();
-
-	if( Dim <= 0 || Sam <= 0 || Ord <= 0)
+	if (hAS == NULL)
 		return;
 
-	Stroke::Init(Dim, ReSam);
-
-	float* pP = pPnt;
-	for (int i = 0; i < Sam; i++, pPnt += Dim)
-		Add(Dim, pPnt);
-
-	m_Basis.Init(Ord, ReSam);  
-
-	m_pApp = new float[Dim*ReSam];
-	memset( m_pApp, 0, Dim*ReSam*sizeof(float) ); 
-
-	m_pRsm = new float[Dim*ReSam];
-	memset( m_pRsm, 0, Dim*ReSam*sizeof(float) ); 
-
-	m_pBck = new float[Dim*ReSam+1];
-	memset( m_pBck, 0, (Dim*ReSam+1)*sizeof(float) );
-		
-	m_pCfs = new float[Dim*ReSam];
-	memset( m_pCfs, 0, Dim*ReSam*sizeof(float) );  
-
-	m_pAppRS = new _RSDATA[ReSam];
-	memset( m_pAppRS, 0, ReSam*sizeof(_RSDATA) );
-		
-	m_ReSam = ReSam;
-
-	SetNaturalParam();
-	Approx();
-	AppErr();
-	Tracing();
-
+	APPSTROKE* pAS = (APPSTROKE*)hAS;
+	AppStroke_Clear(pAS);
+	free(pAS);
 }
 
-
-AppStroke::AppStroke( AppStroke& S ) : Stroke( S )
+VOID AppStroke_ZeroInit(APPSTROKE * pAS)
 {
-	int  Dim =  S.m_Dim;
+	if (pAS == NULL)
+		return;
 
-	m_ReSam  =  0;
+	pAS->m_ReSam = 0;
 
-	m_pApp   =  0;
-	m_pRsm   =  0;
-	m_pBck   =  0;
+	pAS->m_pApp = NULL;
+	pAS->m_pRsm = NULL;
 
-	m_pCfs    =  0;
+	pAS->m_pCfs = NULL;
 
-	m_Err    = S.m_Err;
-	m_Lam    = S.m_Lam;
+	pAS->m_pAppRS = NULL;
 
-	m_pAppRS =  0;
+	pAS->m_Lam    = (FLOAT)0.0;
+	pAS->m_RMSErr = (FLOAT)0.0;
+	pAS->m_MaxErr = (FLOAT)0.0;
 
-	m_Basis = S.m_Basis;
+	Basis_ZeroInit ( &(pAS->m_Basis ) );
+	Stroke_ZeroInit( &(pAS->m_Stroke) );
+
+	return;
+}
+
+VOID AppStroke_Clear(APPSTROKE* pAS)
+{
+	if (pAS == NULL)
+		return;
+
+	if (pAS->m_pApp != 0)
+		free(pAS->m_pApp);
+	if (pAS->m_pRsm != 0)
+		free(pAS->m_pRsm);
+
+	if (pAS->m_pCfs != 0)
+		free(pAS->m_pCfs);
+
+	if (pAS->m_pAppRS != 0)
+		free(pAS->m_pAppRS);
 
 
-	if( S.m_ReSam != 0 )
+	Basis_Clear ( &(pAS->m_Basis)  );
+	Stroke_Clear( &(pAS->m_Stroke) );
+
+	AppStroke_ZeroInit(pAS);
+}
+
+ERR_CODE AppStroke_Init(hAPPSTROKE hAS, INT Dim, INT Ord, INT ReSam, INT Sam, FLOAT * pPnt)
+{
+	ERR_CODE err_code = err_code_OK;
+
+	FLOAT* pApp = NULL;
+	FLOAT* pRsm = NULL;
+	FLOAT* pCfs = NULL;
+
+	RSDATA* pAppRS = NULL;
+
+	if (hAS == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+
+	if (Dim <= 0 || Sam <= 1 || Ord <= 0 || ReSam <= 1)
+		return err_code_WRONG_PARAMETER;;
+
+	APPSTROKE* pAS = (APPSTROKE*)hAS;
+
+	AppStroke_Clear(pAS);
+	
+	pAS->m_pApp = (FLOAT*)malloc(Dim*ReSam*sizeof(FLOAT));
+	pAS->m_pRsm = (FLOAT*)malloc(Dim*ReSam*sizeof(FLOAT));
+	pAS->m_pCfs = (FLOAT*)malloc(Dim*ReSam*sizeof(FLOAT));
+
+	pAS->m_pAppRS = (RSDATA*)malloc(ReSam*sizeof(RSDATA));
+
+	if (pAS->m_pApp == NULL || pAS->m_pRsm == NULL || pAS->m_pCfs == NULL || pAS->m_pAppRS == NULL)
 	{
-		if( S.m_pApp != 0 )
-		{
-			m_pApp = new float[Dim * S.m_ReSam];
-			if( m_pApp != 0 && S.m_pApp != 0 )
-				memcpy( m_pApp, S.m_pApp, Dim*S.m_ReSam*sizeof(float) ); 
-		}
-
-		if( S.m_pRsm != 0 )
-		{
-			m_pRsm = new float[Dim * S.m_ReSam];
-			if( m_pRsm != 0 && S.m_pRsm != 0)
-				memcpy( m_pRsm, S.m_pRsm, Dim*S.m_ReSam*sizeof(float) ); 
-		}
-
-		if( S.m_pBck != 0 )
-		{
-			m_pBck = new float[Dim*S.m_ReSam + 1];
-			if( m_pBck != 0 && S.m_pBck != 0)
-				memcpy( m_pBck, S.m_pBck, (Dim*S.m_ReSam+1)*sizeof(float) ); 
-		}
-
-		if( S.m_pAppRS != 0 )
-		{
-			m_pAppRS = new _RSDATA[S.m_ReSam];
-			if( m_pAppRS != 0 && S.m_pAppRS )
-				memcpy( m_pAppRS, S.m_pAppRS, S.m_ReSam*sizeof(_RSDATA) ); 
-		}
-
-		if( S.m_pCfs != 0 )
-		{
-			m_pCfs = new float[Dim*S.m_ReSam];
-			if( m_pCfs != 0 && S.m_pCfs != 0)
-				memcpy( m_pCfs, S.m_pCfs, Dim*S.m_ReSam*sizeof(float) ); 
-		}
-
-		m_ReSam = S.m_ReSam;
+		AppStroke_Clear(pAS);
+		return err_code_OUT_OF_MEMORY;
 	}
+
+	memset(pAS->m_pApp,   0, Dim*ReSam*sizeof(float) );
+	memset(pAS->m_pRsm,   0, Dim*ReSam*sizeof(float) );
+	memset(pAS->m_pCfs,   0, Dim*ReSam*sizeof(float) );
+	memset(pAS->m_pAppRS, 0, ReSam*sizeof(RSDATA) );
+		
+	pAS->m_ReSam = ReSam;
+
+	err_code = Basis_Init(&(pAS->m_Basis), Ord, ReSam);
+	if (err_code != err_code_OK)
+	{
+		AppStroke_Clear(pAS);
+		return err_code;
+	}
+
+	err_code = Stroke_Init(&(pAS->m_Stroke), Dim, Sam);
+	if (err_code != err_code_OK)
+	{
+		AppStroke_Clear(pAS);
+		return err_code;
+	}
+
+	err_code = Stroke_AddPoints(&(pAS->m_Stroke), Dim, Sam, pPnt);
+	if (err_code != err_code_OK)
+	{
+		AppStroke_Clear(pAS);
+		return err_code;
+	}
+
+	err_code = AppStroke_ResetParam(pAS);
+	if (err_code != err_code_OK)
+	{
+		AppStroke_Clear(pAS);
+		return err_code;
+	}
+
+	err_code = AppStroke_ParamApp(pAS, (INT)1, (FLOAT)(-1.0), NULL);
+	if (err_code != err_code_OK)
+	{
+		AppStroke_Clear(pAS);
+		return err_code;
+	}
+
+	return err_code_OK;
 }
 
-AppStroke::~AppStroke()
+ERR_CODE AppStroke_ParamApp(hAPPSTROKE hAS, INT nItr, FLOAT TargetErr, INT * pFinalItr)
 {
-	Clear();
-}
+	ERR_CODE err_code = err_code_OK;
 
+	INT it;
+	INT Dim, Sam, ReSam, Ord;
+	FLOAT* pOrg, * pApp, * pRsm, * pCfs, *pBasis;
+	RSDATA* pOrgRS, * pAppRS;
 
-void   AppStroke::SaveRsmState()
-{
-	int cb = m_Dim*m_ReSam*sizeof(float);
-	memcpy( (void *)m_pBck, m_pRsm, cb );
-}
+	if (hAS == NULL)
+		return err_code_ZERO_POINTER_PASSED;
 
-void   AppStroke::LoadRsmState()
-{
-	int cb = m_Dim*m_ReSam*sizeof(float); 
-	memcpy( m_pRsm, (void *)m_pBck, cb );
-}
+	APPSTROKE* pAS = (APPSTROKE*)hAS;
 
-int   AppStroke::ParamApp( int nItr, float MaxErr )     
-{
-	int it = 0;
+	Dim    = pAS->m_Stroke.m_Dim;
+	Sam    = pAS->m_Stroke.m_Sam;
+	pOrg   = pAS->m_Stroke.m_pOrg;
+	pOrgRS = pAS->m_Stroke.m_pOrgRS;
+
+	if (Dim <= 0 || Sam <= 1 || pOrg == NULL || pOrgRS == NULL)
+		return err_code_BAD_STRUCTURE_CONTENT;
+
+	ReSam  = pAS->m_ReSam;
+	pRsm   = pAS->m_pRsm;
+	pApp   = pAS->m_pApp;
+	pAppRS = pAS->m_pAppRS;
+
+	if (ReSam <= 1 || pRsm == NULL || pApp == NULL || pOrgRS == NULL)
+		return err_code_BAD_STRUCTURE_CONTENT;
+
+	Ord    = pAS->m_Basis.m_Ord;
+	pCfs   = pAS->m_pCfs;
+	pBasis = pAS->m_Basis.m_pBasis;
+
+	if (Ord < 1 || pCfs == NULL || pBasis == NULL)
+		return err_code_BAD_STRUCTURE_CONTENT;
+	
+	if(_ABS(pOrgRS[Sam - 1].r) < ZERO_PRECISION)
+		return err_code_BAD_STRUCTURE_CONTENT;
+
+	it = 0;
 	for( ; it < nItr; it++ )
 	{
-		Repar  ();
-		Approx ();
-		AppErr ();
-		Tracing();
-		if (MaxErr > 0.0f && m_Err < MaxErr)
+		AppStroke_Repar  (Dim, Sam, pOrg, pOrgRS, ReSam, pRsm, pApp, pAppRS);
+		AppStroke_Approx (Dim, ReSam, pRsm, pApp, Ord, pBasis, pCfs);
+		AppStroke_Tracing(Dim, ReSam, pApp, pAppRS);
+		if (_ABS(pAppRS[Sam - 1].r) < ZERO_PRECISION)
+		{
+			err_code = err_code_ALGORITHM_FAILURE;
 			break;
-	} // End of it
+		}
+
+		pAS->m_RMSErr = AppStroke_AppErr(Dim, ReSam, pRsm, pApp, &(pAS->m_MaxErr));
+		pAS->m_Lam    = (_ABS(pAppRS[Sam - 1].r) > ZERO_PRECISION) ? pOrgRS[Sam-1].r / pAppRS[ReSam-1].r : (FLOAT)0.0;
+
+		if (pAS->m_RMSErr < TargetErr)
+			break;
+	} 
 	
-	return it;
+	if (pFinalItr != NULL)
+		*pFinalItr = it;
+
+	return err_code;
 }
 
-void   AppStroke::Approx()
+ERR_CODE AppStroke_ResetParam(hAPPSTROKE hAS)
 {
-	int Ord = m_Basis.m_Ord;
+	INT i;
+	FLOAT ds;
 
-	memset( m_pApp, 0, m_Dim*m_ReSam*sizeof(float) );
-	for( int k = 0; k < m_Dim; k++ ) 
+	if (hAS == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+
+	APPSTROKE* pAS = (APPSTROKE*)hAS;
+
+	INT Sam = pAS->m_Stroke.m_Sam;
+	INT ReSam = pAS->m_ReSam;
+	RSDATA* pOrgRS = pAS->m_Stroke.m_pOrgRS;
+	RSDATA* pAppRS = pAS->m_pAppRS;
+
+	if (Sam <= 1 || ReSam <= 1 || pOrgRS == NULL || pAppRS == NULL)
+		return err_code_BAD_STRUCTURE_CONTENT;
+
+	ds = pOrgRS[Sam - 1].r / (FLOAT)(ReSam - 1);
+
+	pAppRS[0].s = (FLOAT)0.0;
+	pAppRS[0].r = (FLOAT)0.0;
+	for (i = 1; i < ReSam; i++)
 	{
-		float  * pBas;
-		pBas   = m_Basis.m_pBasis;
-		for( int i = 0; i < Ord; i++ )
-		{
-			float   C  = 0.0f;
-			float * pR = m_pRsm + k;
-			for( int j = 0;  j < m_ReSam; j++, pR += m_Dim, pBas++ )
-				C += (*pR) * (*pBas);
-
-			m_pCfs[Ord*k+i] = C;
-		}
-
-		pBas   = m_Basis.m_pBasis;
-		for( int i = 0; i < Ord; i++ )
-		{
-			float    C  = m_pCfs[Ord*k+i];
-			float  * pA = m_pApp + k;
-			for( int j  = 0; j < m_ReSam; j++, pA += m_Dim, pBas++ )
-				*pA += C * (*pBas);
-		}
-	}
-}
-
-void   AppStroke::Decompose()
-{
-	int Ord = m_Basis.m_Ord;
-
-	for( int k = 0; k < m_Dim; k++ ) 
-	{
-		float * pBas = m_Basis.m_pBasis;
-		for( int i = 0; i < Ord; i++ )
-		{
-			float   C  = 0.0f;
-			float * pR = m_pRsm + k;
-			for( int j = 0;  j < m_ReSam; j++, pR += m_Dim, pBas++ )
-				C += (*pR) * (*pBas);
-
-			m_pCfs[Ord*k+i] = C;
-		}
-	}
-}
-
-void   AppStroke::Restore()
-{
-	int Ord = m_Basis.m_Ord;
-
-	memset( m_pApp, 0, m_Dim*m_ReSam*sizeof(float) );
-
-	for( int k = 0; k < m_Dim; k++ )
-	{
-		float  * pBas =  m_Basis.m_pBasis;
-		for( int i = 0; i < Ord; i++ )
-		{
-			float    C  = m_pCfs[Ord*k+i];
-			float  * pA = m_pApp + k;
-			for( int j  = 0; j < m_ReSam; j++, pA += m_Dim, pBas++ )
-				*pA += C * (*pBas);
-		}
-	}  //  for( k );
-}
-
-void   AppStroke::ResetParam()
-{
-	float      ds = m_pOrgRS[m_Sam-1].r / (float)(m_ReSam - 1);
-
-	m_pAppRS[0].s = 0.0f;
-	m_pAppRS[0].r = 0.0f;
-	for( int i = 1; i < m_ReSam; i++ )
-	{
-	    m_pAppRS[i].s = ds;
-		m_pAppRS[i].r = m_pAppRS[i-1].r + ds;
-	}
-}
-
-void  AppStroke::Repar( )
-{
-	int       i, j, k;
-	float     Alfa, Curr;
-
-	for( k = 0; k < m_Dim; k++ )
-	{
-		m_pRsm[k]                   = m_pOrg[k];
-		m_pRsm[m_Dim*(m_ReSam-1)+k] = m_pOrg[m_Dim*(m_Sam-1)+k];
+		pAppRS[i].s = ds;
+		pAppRS[i].r = pAppRS[i - 1].r + ds;
 	}
 
-	m_pAppRS[0].idx = 0;
-	m_pAppRS[0].alf = 0.0f;
+	return err_code_OK;
+}
 
-	m_Lam  = m_pOrgRS[m_Sam-1].r / m_pAppRS[m_ReSam-1].r;
+FLOAT  AppStroke_Repar(INT Dim, INT Sam, FLOAT* pOrg, RSDATA* pOrgRS,
+	                   INT ReSam, FLOAT* pRsm, FLOAT* pApp, RSDATA* pAppRS)
+{
+	INT       i, j, k;
+	FLOAT     x1, x2, dx;
+	FLOAT     Alfa, Curr;
+	FLOAT     Lam = (FLOAT)1.0;
 
-	for( i = j = 1; i < (m_ReSam - 1); i++ )
+	for (k = 0; k < Dim; k++)
 	{
-		Curr = m_Lam * m_pAppRS[i].r;
+		pRsm[k] = pOrg[k];
+		pRsm[Dim*(ReSam - 1) + k] = pOrg[Dim * (Sam - 1) + k];
+	}
 
-		while( Curr  > m_pOrgRS[j].r + 0.001f )
-		{ 
-			m_pOrgRS[j].idx = i;
+	Lam = pOrgRS[Sam - 1].r / pAppRS[ReSam - 1].r;
 
+	for (i = j = 1; i < (ReSam - 1); i++)
+	{
+		Curr = Lam * pAppRS[i].r;
+
+		while (Curr > pOrgRS[j].r + (FLOAT)0.001)
+		{
 			j++;
-		 
-			if( j == m_Sam )
+
+			if (j == Sam)
 			{
-				for( ; i < m_ReSam; i++ )
+				for (; i < ReSam; i++)
 				{
-					for( k = 0; k < m_Dim; k++ )
-						m_pRsm[m_Dim*i+k] = m_pOrg[m_Dim*(m_Sam-1)+k] / m_Lam;
+					for (k = 0; k < Dim; k++)
+						pRsm[Dim*i + k] = pOrg[Dim*(Sam - 1) + k] / Lam;
 				}
 				goto END;
 			}	 // if( j==Sam )
-		  
 		}	// while
 
-		if( m_pOrgRS[j].s == 0.0f )
-			Alfa = 1.0f;
+		if (pOrgRS[j].s == (FLOAT)0.0)
+			Alfa = (FLOAT)1.0;
 		else
-			Alfa = 1 - (m_pOrgRS[j].r - Curr) / m_pOrgRS[j].s;
+			Alfa = 1 - (pOrgRS[j].r - Curr) / pOrgRS[j].s;
 
-		for( k = 0; k < m_Dim; k++ )
+		for (k = 0; k < Dim; k++)
 		{
-			float  x2 = m_pOrg[m_Dim*(j  )+k];
-			float  x1 = m_pOrg[m_Dim*(j-1)+k];
-			float  dx = x2 - x1;
+			x2 = pOrg[Dim*j+k];
+			x1 = pOrg[Dim*(j - 1) + k];
+			dx = x2 - x1;
 
-			m_pRsm[m_Dim*i+k] = x1 + dx*Alfa;
+			pRsm[Dim*i + k] = x1 + dx*Alfa;
 		}
-
-		m_pAppRS[i].idx = j-1;
-		m_pAppRS[i].alf = Alfa;
-   }
+	}
 END:
-   m_pAppRS[m_ReSam-1].idx = m_Sam-1;
-   m_pAppRS[m_ReSam-1].alf = 1.0f;
+	return Lam;
 }
 
-
-void  AppStroke::Tracing()
+VOID AppStroke_Approx(INT Dim, INT ReSam, FLOAT* pRsm, FLOAT* pApp, INT Ord, FLOAT* pBasis, FLOAT* pCfs)
 {
-	float  dl = m_pAppRS[0].s = m_pAppRS[0].r = 0.0f;
+	INT    i, k;
+	FLOAT  C;
+	FLOAT* pBas;
+	FLOAT* pR, *pA;
 
-	float  * pA  = m_pApp;
-	p_RSDATA pRS = m_pAppRS + 1;
-	for( int i = 1; i < m_ReSam; i++, pRS++ )
+	memset(pApp, 0, Dim*ReSam*sizeof(FLOAT));
+
+	for(k = 0; k < Dim; k++) 
 	{
-		double  ds = 0.0;
-		for( int k = 0; k < m_Dim; k++, pA++ )
+		pBas = pBasis;
+
+		for(i = 0; i < Ord; i++)
 		{
-			float dx = pA[m_Dim] - pA[0];
+			C  = (FLOAT)0.0;
+			pR = pRsm + k;
+			for( int j = 0;  j < ReSam; j++, pR += Dim, pBas++ )
+				C += (*pR) * (*pBas);
+
+			pCfs[Ord*k+i] = C;
+		}
+
+		pBas   = pBasis;
+		for( int i = 0; i < Ord; i++ )
+		{
+			C  = pCfs[Ord*k+i];
+			pA = pApp + k;
+			for( int j  = 0; j < ReSam; j++, pA += Dim, pBas++ )
+				*pA += C * (*pBas);
+		}
+	}
+}
+
+FLOAT AppStroke_AppErr(INT Dim, INT ReSam, FLOAT* pRsm, FLOAT* pApp, FLOAT* pMaxErr)
+{
+	FLOAT Err    = (FLOAT)0.0;
+	FLOAT MaxErr = (FLOAT)0.0;
+
+	FLOAT E, T;
+
+	FLOAT* pA = pApp;
+	FLOAT* pR = pRsm;
+
+	INT i, k;
+
+	for (i = 0; i < ReSam; i++)
+	{
+		E = (FLOAT)0.0;
+		for (k = 0; k < Dim; k++, pA++, pR++)
+		{
+			T = *pA - *pR;
+			E += T * T;
+		}
+
+		Err += E;
+		if (E > MaxErr)
+			E = MaxErr;
+	}
+
+	Err = (FLOAT)sqrt(Err / ReSam);
+
+	if (pMaxErr != NULL)
+		*pMaxErr = MaxErr;
+
+	return Err;
+}
+
+VOID AppStroke_Tracing(INT Dim, INT ReSam, FLOAT* pApp, RSDATA* pAppRS)
+{
+	INT i, k;
+	FLOAT  ds, dx;
+	FLOAT  dl = (FLOAT)0.0;
+
+	FLOAT* pA = pApp;
+	RSDATA* pRS = pAppRS + 1;
+	
+	pAppRS[0].s = pAppRS[0].r = (FLOAT)0.0;
+
+	for (i = 1; i < ReSam; i++, pRS++)
+	{
+		ds = 0.0;
+		for (k = 0; k < Dim; k++, pA++)
+		{
+			dx = pA[Dim] - pA[0];
 			ds += dx * dx;
 		}
-		ds     = sqrt( ds );
-		pRS->s = (float)ds;
-		pRS->r = (pRS-1)->r + (float)ds;
+		ds     = (FLOAT)sqrt( ds );
+		pRS->s = ds;
+		pRS->r = (pRS-1)->r + ds;
     }
 
-	m_Lam = m_pOrgRS[m_Sam - 1].r / m_pAppRS[m_ReSam - 1].r;
+	return;
 }
 
-void AppStroke::AppErr()
+FLOAT AppStroke_GetRSMError(hAPPSTROKE hAS)
 {
-   m_Err  = 0;
-
-   float * pA = m_pApp;
-   float * pR = m_pRsm;
-   for( int i = 0; i < m_ReSam; i++ )
-   {
-      float     E = 0;
-      for( int  k = 0; k < m_Dim; k++, pA++, pR++ )
-      {
-         float  T = *pA - *pR;  
-		 E  +=  T * T;
-      }
-
-      m_Err += E;
-   }
-
-   m_Err = (float)sqrt( m_Err / m_ReSam );
+	return hAS != NULL ? ((APPSTROKE*)hAS)->m_RMSErr : (FLOAT)(-1.0);
 }
 
-void  AppStroke::SetNaturalParam()
+FLOAT AppStroke_GetMaxError(hAPPSTROKE hAS)
 {
-	ResetParam();
-	Repar     ();
+	return hAS != NULL ? ((APPSTROKE*)hAS)->m_MaxErr : (FLOAT)(-1.0);
 }
 
-float  AppStroke::PolyError2( float * pDat )
+FLOAT AppStroke_GetLambda(hAPPSTROKE hAS)
 {
-	float   MaxErr = 0;
-	float   Sin, Cos;
-
-	if( pDat == 0 ) pDat = m_pRsm;
-
-	m_Err         = 0.0f;
-
-	float  * pR   = pDat;
-	p_RSDATA pRS  = m_pAppRS;
-	for( int i = 1; i < m_ReSam; i++, pR += m_Dim, pRS++ )
-	{
-	  float   x1  = pR[0      ]; 
-	  float   x2  = pR[m_Dim  ]; 
-	  float   y1  = pR[1      ]; 
-	  float   y2  = pR[m_Dim+1]; 
-
-	  float   t, dd;
-
-	  t   = x1 - x2;
-	  dd  = t * t;
-	  t   = y1 - y2;
-	  dd += t * t;
-	  dd  = (float)sqrt(dd); 
-
-	  Cos   = (x2 - x1) / dd;
-	  Sin   = (y2 - y1) / dd;
-
-	  int      j1 = pRS[0].idx;
-	  int      j2 = pRS[1].idx;
-
-	  float  * pD = m_pOrg + m_Dim*j1;
-      for( int  j = j1; j < j2; j++, pD += m_Dim )
-      {
-		 float  x = pD[0] - x1;
-		 float  y = pD[1] - y1;
-
-		 float  H = -x*Sin + y*Cos;
-		 if( H < 0 ) H = -H; 
-
-		 if( MaxErr < H ) 
-			 MaxErr = H;
-
-		 m_Err += H;
-      }
-   }
-
-   m_Err /= m_Sam;
-
-   return  MaxErr;
+	return hAS != NULL ? ((APPSTROKE*)hAS)->m_Lam : (FLOAT)(-1.0);
 }
 
-void  AppStroke::Rsm2App()
+ERR_CODE AppStroke_GetApproximatedPoints(hAPPSTROKE hAS, INT Dim, INT ReSam, FLOAT* pAppPoints)
 {
-	if( m_pApp && m_pRsm )
-		memcpy( m_pApp, m_pRsm, m_Dim * m_ReSam * sizeof(float) );
+	if (hAS == NULL || pAppPoints == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+
+	APPSTROKE* pAS = (APPSTROKE*)hAS;
+
+	if (pAS->m_Stroke.m_Dim <= 1 || pAS->m_ReSam <= 0)
+		return err_code_BAD_STRUCTURE_CONTENT;
+
+	if (Dim != pAS->m_Stroke.m_Dim || ReSam != pAS->m_ReSam)
+		return err_code_WRONG_PARAMETER;
+
+	memcpy(pAppPoints, pAS->m_pApp, Dim*ReSam*sizeof(FLOAT));
+
+	return err_code_OK;
 }
 
-void  AppStroke::App2Rsm()
-{
-	if( m_pApp && m_pRsm )
-		memcpy( m_pRsm, m_pApp, m_Dim * m_ReSam * sizeof(float) );
-}
-
-bool  AppStroke::GetRsmAt( int Idx, float *pX, float *pY, float *pZ )
-{
-	if( Idx > m_ReSam-1 )
-		return false;
-
-	float * pCur = m_pRsm + m_Dim*Idx;
-
-	*pX = pCur[0];
-	*pY = pCur[1];
-	if( pZ != 0 )
-	   *pZ = pCur[2];
-
-
-	return true;
-}
-
-bool  AppStroke::GetAppAt( int Idx, float *pX, float *pY, float *pZ )
-{
-	if( Idx > m_ReSam-1 )
-		return false;
-
-	float * pCur = m_pApp + m_Dim*Idx;
-
-	*pX = pCur[0];
-	*pY = pCur[1];
-	if( pZ != 0 )
-	   *pZ = pCur[2];
-
-	return true;
-}
 
 
 

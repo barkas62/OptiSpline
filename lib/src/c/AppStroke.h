@@ -1,62 +1,30 @@
-#if !defined(AFX_APPSTROKE_H__1536C282_C445_11D1_B2F6_006008332431__INCLUDED_)
-#define AFX_APPSTROKE_H__1536C282_C445_11D1_B2F6_006008332431__INCLUDED_
+#ifndef _APPSTROKE_H_INCLUDED_
+#define _APPSTROKE_H_INCLUDED_
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
+#include "types.h"
 
-#include "Stroke.h"
-#include "Basis.h"
+typedef VOID* hAPPSTROKE;
  
-class AppStroke : public Stroke
-{
-public:
-	int        m_ReSam = 0;
+#ifdef __cplusplus
+extern "C" {
+#endif 
+hAPPSTROKE AppStroke_Create();
+VOID       AppStroke_Delete(hAPPSTROKE hAS);
 
-	float    * m_pApp = 0;
-	float    * m_pRsm = 0;
-	float    * m_pBck = 0;
+ERR_CODE   AppStroke_Init(hAPPSTROKE hAS, INT Dim, INT Ord, INT ReSam, INT Sam, FLOAT* pPnt);
 
-	float    * m_pCfs = 0;
+ERR_CODE AppStroke_ResetParam(hAPPSTROKE hAS);
+ERR_CODE AppStroke_ParamApp  (hAPPSTROKE hAS, INT nItr, FLOAT TargetErr, INT* pFinalItr);
 
-	p_RSDATA   m_pAppRS = 0;
+// Getting Results
+FLOAT AppStroke_GetRSMError(hAPPSTROKE hAS);
+FLOAT AppStroke_GetMaxError(hAPPSTROKE hAS);
+FLOAT AppStroke_GetLambda  (hAPPSTROKE pAS);
 
-	float      m_Lam = 1.0f;
-	float      m_Err = 0.0f;
+ERR_CODE AppStroke_GetApproximatedPoints(hAPPSTROKE pAS, INT Dim, INT ReSam, FLOAT* pAppPoints);
 
-	Basis      m_Basis;
+#ifdef __cplusplus
+}
+#endif
 
-public:
-	AppStroke() : Stroke() {};
-	AppStroke( AppStroke& S );
-	virtual   ~AppStroke();
-
-	void Clear();
-	void Init(int Dim, int Sam, int Ord, int ReSam, float* pPnt);
-
-	void	Decompose ();
-	void	Restore   ();
-	void	Approx    ();
-
-	int	ParamApp  ( int nItr, float MaxErr = -1.0f);
-
-	void	ResetParam();
-	void	Repar     ();
-	void	Tracing   ();
-	void	AppErr    ();
-
-	void    SetNaturalParam();
-
-	void	SaveRsmState();
-	void	LoadRsmState();
-
-	float   GetErr() { return m_Err; }
-
-	float   PolyError2( float * pDat = 0 );
-	void    Rsm2App   ();
-	void    App2Rsm   ();
-	bool	GetRsmAt( int Idx, float *pX, float *pY, float *pZ = 0 );
-	bool	GetAppAt( int Idx, float *pX, float *pY, float *pZ = 0 );
-};
-
-#endif // !defined(AFX_APPSTROKE_H__1536C282_C445_11D1_B2F6_006008332431__INCLUDED_)
+#endif 
