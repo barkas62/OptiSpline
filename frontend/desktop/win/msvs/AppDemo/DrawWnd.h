@@ -30,13 +30,13 @@ public:
 	BOOL      m_bErase;
     
 
-    float     m_BScale;
-    float     m_BShiftX;
-    float     m_BShiftY;
+	double     m_BScale;
+	double     m_BShiftX;
+	double     m_BShiftY;
 
-	float     m_X;
-	float     m_Y;
-	float     m_Z;
+	double     m_X;
+	double     m_Y;
+	double     m_Z;
 
 	CWnd    * m_pHostWnd;
 	CBitmap * m_pBmp; 
@@ -49,7 +49,7 @@ public:
 //	DECLARE_DYNCREATE(CDrawWnd)
 
 	void ClearStroke();
-	void SetStroke(std::vector<float>& vPoints, int nOrd, int nReSam);
+	void SetStroke(std::vector<double>& vPoints, int nOrd, int nReSam);
 	void ResetStroke(int nOrd, int nReSam);
 	void AppStep();
 

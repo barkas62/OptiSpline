@@ -46,7 +46,7 @@ void BStroke::Clear()
     m_pOptiSpline = 0;
 }
 
-void BStroke::Init(std::vector<float>& Points, int nOrd, int nReSam) 
+void BStroke::Init(std::vector<double>& Points, int nOrd, int nReSam)
 {
     if (Points.size() > 2 && nOrd > 0 && nReSam > nOrd)
     {
@@ -66,8 +66,8 @@ void BStroke::Reset(int nOrd, int nReSam)
 
 BStroke::BStroke( const BStroke& Strk ) 
 {
-    if (Strk.m_pOptiSpline)
-        m_pOptiSpline = CopyOptiSpline(Strk.m_pOptiSpline);
+    //if (Strk.m_pOptiSpline)
+    //    m_pOptiSpline = CopyOptiSpline(Strk.m_pOptiSpline);
 }
 
 BStroke::~BStroke()

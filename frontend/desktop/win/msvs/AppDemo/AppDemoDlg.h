@@ -35,7 +35,7 @@ public:
 
 	int         m_Iter;
 
-	float		m_CfsNorm;
+	double		m_CfsNorm;
 
 	UINT        m_WhatDraw;
 

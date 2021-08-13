@@ -277,18 +277,18 @@ LONG CAppDemoDlg::OnSourceReady( UINT wParam, LONG lParam )
 	{
 		int Sam = m_pDrawWnd->m_InkData.GetSize() / 3; 
 		
-		std::vector<float> Points;
+		std::vector<double> Points;
 		Points.reserve(2 * Sam);
 
 		int    idx = 0;
-		float OldX = -1.0f;
-		float OldY = -1.0f;
+		double OldX = -1.0f;
+		double OldY = -1.0f;
 
 		for( int i = 0; i < Sam; i++  )
 		{
-			float x = (float)m_pDrawWnd->m_InkData.GetAt( idx++ );
-			float y = (float)m_pDrawWnd->m_InkData.GetAt( idx++ );
-			float p = (float)m_pDrawWnd->m_InkData.GetAt( idx++ );
+			double x = (double)m_pDrawWnd->m_InkData.GetAt( idx++ );
+			double y = (double)m_pDrawWnd->m_InkData.GetAt( idx++ );
+			double p = (double)m_pDrawWnd->m_InkData.GetAt( idx++ );
 			if( p < 0.0f || p > 255.0f )
 				p = 0.0f;
 
@@ -360,9 +360,9 @@ void CAppDemoDlg::SetSource( SrcMode Mode )
 	int W = R.Width();
 	int L = R.Height();
 
-	float D = (W>L ? L : W) / 4.0f;
+	double D = (W>L ? L : W) / 4.0f;
 
-	std::vector<float> vSquare = {
+	std::vector<double> vSquare = {
 		  D,   D,
 		3*D,   D,
 		3*D, 3*D,
@@ -370,14 +370,14 @@ void CAppDemoDlg::SetSource( SrcMode Mode )
 		  D,   D
 	};
 
-	std::vector<float> vTriangle = {
+	std::vector<double> vTriangle = {
 		2*D,   D,
 		3*D, 3*D,
 		  D, 3*D,
 		2*D,   D
 	};
 
-	std::vector<float> vLambda = {
+	std::vector<double> vLambda = {
 		  D/2, 3*D,
 		3*D/2, 3*D,
 		2*D,     D,

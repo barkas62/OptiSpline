@@ -18,22 +18,22 @@ public:
 	BStroke();
 	BStroke( const BStroke& pStrk );
 
-    void Init(std::vector<float>& Points, int nOrd, int nReSam);
+    void Init(std::vector<double>& Points, int nOrd, int nReSam);
     void Reset(int nOrd, int nReSam);
     bool AppStep();
     bool GetAppResults();
 
-    std::vector<float> m_OrgPoints;
-    std::vector<float> m_AppPoints;
-    std::vector<float> m_RsmPoints;
-    std::vector<float> m_BezPoints;
+    std::vector<double> m_OrgPoints;
+    std::vector<double> m_AppPoints;
+    std::vector<double> m_RsmPoints;
+    std::vector<double> m_BezPoints;
 
     int m_Sam   = 0;
     int m_ReSam = 0;
     int m_Ord   = 0;
 
-    float m_Err = 0.0f;
-    float m_Lam = 1.0f;
+    double m_Err = 0.0f;
+    double m_Lam = 1.0f;
 
     CRect    m_BBox;
     CRect    m_ZBox;

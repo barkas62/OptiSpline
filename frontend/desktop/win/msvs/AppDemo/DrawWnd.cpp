@@ -87,7 +87,7 @@ void CDrawWnd::ClearStroke() {
 	m_Strk.Clear();
 }
 
-void CDrawWnd::SetStroke(std::vector<float>& vPoints, int nOrd, int nReSam)
+void CDrawWnd::SetStroke(std::vector<double>& vPoints, int nOrd, int nReSam)
 {
 	m_InkData.RemoveAll();
 	ClearBmp();
@@ -251,12 +251,12 @@ void CDrawWnd::SetBScale( CRect& Bound )
     CPoint C1 = ZBox. CenterPoint();
     CPoint C2 = Bound.CenterPoint();
 
-    float Sc1 =  (float)Bound.Width ()/(float)ZBox.Width ();
-    float Sc2 =  (float)Bound.Height()/(float)ZBox.Height();
+	double Sc1 =  (double)Bound.Width ()/(double)ZBox.Width ();
+	double Sc2 =  (double)Bound.Height()/(double)ZBox.Height();
 
     m_BScale  =  (Sc1 < Sc2) ? Sc1 : Sc2;
-    m_BShiftX =  (float)C2.x - (float)C1.x * m_BScale;
-    m_BShiftY =  (float)C2.y - (float)C1.y * m_BScale;
+    m_BShiftX =  (double)C2.x - (double)C1.x * m_BScale;
+    m_BShiftY =  (double)C2.y - (double)C1.y * m_BScale;
 }
 
 void CDrawWnd::DrawStrk()
@@ -277,7 +277,7 @@ void CDrawWnd::DrawStrk()
 		CPen   APen(PS_SOLID, 2, RGB(0,0,190) );
 		CPen * pOldPen = pMemDC->SelectObject ( &BPen );
 
-		float * pP = m_Strk.m_BezPoints.data();
+		double* pP = m_Strk.m_BezPoints.data();
 
         CRect   ZBox = m_Strk.GetZBox();
         CPoint  C1 = ZBox. CenterPoint();
@@ -285,11 +285,11 @@ void CDrawWnd::DrawStrk()
 
 		for( i = 0; i < m_Strk.m_Ord; i++ )
 		{
-            float xf = m_BScale*pP[i+0] + m_BShiftX;
-            float yf = m_BScale*pP[i+1] + m_BShiftY;
+			double xf = m_BScale*pP[i+0] + m_BShiftX;
+			double yf = m_BScale*pP[i+1] + m_BShiftY;
 
-			int x = (int)(xf+0.5f);
-			int y = (int)(yf+0.5f);
+			int x = (int)(xf+0.5);
+			int y = (int)(yf+0.5);
 
 			if( i == 0 )
 				pMemDC->MoveTo( x, y );
@@ -312,12 +312,12 @@ void CDrawWnd::DrawStrk()
 	{
 		pOldPen = pMemDC->SelectObject ( &SrcPen );
 
-		float* pP = m_Strk.m_OrgPoints.data();
+		double* pP = m_Strk.m_OrgPoints.data();
 
 		for( i = 0; i < m_Strk.m_Sam; i++, pP += 2 )
 		{
-            int x = (int)(pP[0] + 0.5f);
-            int y = (int)(pP[1] + 0.5f);
+            int x = (int)(pP[0] + 0.5);
+            int y = (int)(pP[1] + 0.5);
 			
 			if( i == 0 )
 				pMemDC->MoveTo ( x, y );
@@ -331,11 +331,11 @@ void CDrawWnd::DrawStrk()
 	{
 		pOldPen = pMemDC->SelectObject ( &RsmPen );
 
-		float* pP = m_Strk.m_RsmPoints.data();
+		double* pP = m_Strk.m_RsmPoints.data();
 		for( i = 0; i < m_Strk.m_ReSam; i++, pP += 2 )
 		{
-			int x = (int)(pP[0] + 0.5f);
-			int y = (int)(pP[1] + 0.5f);
+			int x = (int)(pP[0] + 0.5);
+			int y = (int)(pP[1] + 0.5);
 			pMemDC->Ellipse( x-3, y-3, x+3, y+3 );
 		}
 		pMemDC->SelectObject( pOldPen );
@@ -345,11 +345,11 @@ void CDrawWnd::DrawStrk()
 	{
 		pOldPen = pMemDC->SelectObject ( &AppPen );
 
-		float* pP = m_Strk.m_AppPoints.data();
+		double* pP = m_Strk.m_AppPoints.data();
 		for (i = 0; i < m_Strk.m_ReSam; i++, pP += 2)
 		{
-			int x = (int)(pP[0] + 0.5f);
-			int y = (int)(pP[1] + 0.5f);
+			int x = (int)(pP[0] + 0.5);
+			int y = (int)(pP[1] + 0.5);
 
 			if( i == 0 )
 				pMemDC->MoveTo( x, y );
@@ -360,8 +360,8 @@ void CDrawWnd::DrawStrk()
 		pP = m_Strk.m_AppPoints.data();
    		for( i = 0; i < m_Strk.m_ReSam; i++, pP += 2 )
 		{
-			int x = (int)(pP[0] + 0.5f);
-			int y = (int)(pP[1] + 0.5f);
+			int x = (int)(pP[0] + 0.5);
+			int y = (int)(pP[1] + 0.5);
 
             pMemDC->SetPixel( x  , y  , RGB(0,0,0) );
             pMemDC->SetPixel( x+1, y  , RGB(0,0,0) );
