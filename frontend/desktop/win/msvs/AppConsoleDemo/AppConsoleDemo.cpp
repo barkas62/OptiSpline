@@ -7,7 +7,6 @@
 #include "cplusplus\AppStroke.h"
 #include "c\AppStroke.h"
 
-
 using namespace std::chrono;
 
 int main()
@@ -15,9 +14,9 @@ int main()
     std::cout << "Demo: Approximating a square-shaped stroke." << std::endl << std::endl;
 
     // Define a 5-points long stroke in the shape of a square; last vertex coincides with the first one.
-    float d = 300.f;  // side length
+    double d = 300.f;  // side length
 
-    float quadStroke[10] = 
+    double quadStroke[10] = 
     {
                    //    vertexes  
         0.f, 0.f,  // (left,  upper)
@@ -27,7 +26,7 @@ int main()
         0.f, 0.f   // (left,  upper)
     };
 
-    AppStroke AppStrk;
+    AppStroke<2> AppStrk;
 
     int Dim   = 2;    // 2-dimensional stroke  
     int Sam   = 5;    // number of original sampling points (vertexes)
@@ -40,11 +39,12 @@ int main()
 
     std::cout << std::endl << "========= Using C++ Library ===========" << std::endl;
 
-    AppStrk.Init(Dim, Sam, Ord, ReSam, quadStroke);
+    AppStrk.Init(Ord, ReSam, Sam, quadStroke);
 
-    std::cout << "Initial Approximation Error: " << AppStrk.GetErr() << std::endl;
 
-    int  nItr = 6400;
+    std::cout << "Initial Approximation Error: " << AppStrk.GetRMSErr() << std::endl;
+
+    int  nItr = 64000;
 
     auto start = high_resolution_clock::now();
 
@@ -53,7 +53,7 @@ int main()
     auto stop  = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
 
-    float Err = AppStrk.GetErr();
+    double Err = AppStrk.GetRMSErr();
 
     std::cout << "Approximation Error after " << nItr << " iterations: " << Err << std::endl;
     std::cout << "Approximation time: " << duration.count() << " microseconds" << std::endl;

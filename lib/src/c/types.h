@@ -21,7 +21,7 @@ typedef enum {
 	err_code_ALGORITHM_FAILURE     = 5
 } ERR_CODE;
 
-#define M_PI ((FLOAT)3.14159265358979323846)
+// #define M_PI ((FLOAT)3.14159265358979323846)
 
 #define _ABS(x) ((x) > 0 ? (x) :(-(x)))
 

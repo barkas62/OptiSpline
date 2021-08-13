@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include <math.h>
 #include <memory.h>
 #include <malloc.h>
@@ -105,7 +107,7 @@ ERR_CODE Basis_SetCosBasis(BASIS* pB)
 	{
 		FLOAT t = dt / (FLOAT)2.0;
 		for(j = 0; j < pB->m_ReSam; j++, t += dt, pBas++ )
-			*pBas = (float)cos(i * t);
+			*pBas = (FLOAT)cos(i * t);
 	} 
 
 	return Basis_Normalize(pB);

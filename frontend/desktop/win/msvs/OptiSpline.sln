@@ -10,6 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppDemo", "AppDemo\AppDemo.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OptiSpline", "..\..\..\..\lib\builds\win\msvs\OptiSpline\OptiSpline.vcxproj", "{49B1A074-175F-4407-AC0B-D840A705F611}"
 	ProjectSection(ProjectDependencies) = postProject
+		{CDC861A6-0C09-4E87-9515-3FB5074D955D} = {CDC861A6-0C09-4E87-9515-3FB5074D955D}
 		{39A446B8-E6C3-4FAE-A641-270A22B40CD3} = {39A446B8-E6C3-4FAE-A641-270A22B40CD3}
 	EndProjectSection
 EndProject
@@ -22,11 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppConsoleDemo", "AppConsol
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppStrokeC", "..\..\..\..\lib\builds\win\msvs\AppStrokeC\AppStrokeC.vcxproj", "{CDC861A6-0C09-4E87-9515-3FB5074D955D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppConsoleDemoC", "AppConsoleDemoC\AppConsoleDemoC.vcxproj", "{1F0C28BB-C072-476E-8C2A-F22A190BD95E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{CDC861A6-0C09-4E87-9515-3FB5074D955D} = {CDC861A6-0C09-4E87-9515-3FB5074D955D}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,14 +68,6 @@ Global
 		{CDC861A6-0C09-4E87-9515-3FB5074D955D}.Release|x64.Build.0 = Release|x64
 		{CDC861A6-0C09-4E87-9515-3FB5074D955D}.Release|x86.ActiveCfg = Release|Win32
 		{CDC861A6-0C09-4E87-9515-3FB5074D955D}.Release|x86.Build.0 = Release|Win32
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Debug|x64.ActiveCfg = Debug|x64
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Debug|x64.Build.0 = Debug|x64
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Debug|x86.ActiveCfg = Debug|Win32
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Debug|x86.Build.0 = Debug|Win32
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Release|x64.ActiveCfg = Release|x64
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Release|x64.Build.0 = Release|x64
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Release|x86.ActiveCfg = Release|Win32
-		{1F0C28BB-C072-476E-8C2A-F22A190BD95E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

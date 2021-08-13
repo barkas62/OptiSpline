@@ -1,35 +1,68 @@
-// Basis.h: interface for the Basis class.
-//
-//////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_BASIS_H__1536C284_C445_11D1_B2F6_006008332431__INCLUDED_)
-#define AFX_BASIS_H__1536C284_C445_11D1_B2F6_006008332431__INCLUDED_
+#ifndef _BASIS_HPP_INCLUDED_
+#define _BASIS_HPP_INCLUDED_
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
-class  AppStroke;
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <vector>
 
 class Basis  
 {
 public:
 	int		m_Ord; 
 	int		m_ReSam; 
-	float * m_pBasis;
+	std::vector<double> m_Basis;
+	std::vector<double> m_Norms;
 
-	float * m_pNorms;
+	using it_T = typename std::vector<double>::iterator;
 
 public:
-	Basis();
-	Basis( const Basis& Bas );
-	virtual ~Basis();
 
-	void    Init ( int Ord, int ReSam );
-	void    ClearBasis();
-	void	CosBasis  ();
-	void    CosBasis( int ReSam0 );
-	void    Norm      ();
+	void Init(int Ord, int ReSam)
+	{
+		m_Basis.resize(Ord*ReSam, 1.0);
+		m_Norms.resize(Ord, 0.0);
+
+		m_Ord = Ord;
+		m_ReSam = ReSam;
+
+		double dt = M_PI / ReSam;
+		for (int i = 1; i < Ord; i++)
+		{
+			double t = dt / 2.0;
+			it_T v = GetVector(i);
+			for (int j = 0; j < ReSam; j++, t += dt, ++v)
+				*v = cos(i * t);
+		} // for(i)
+
+		Normalize();
+	}
+
+	it_T GetVector(int i)
+	{
+		return m_Basis.begin() + i*m_ReSam;
+	}
+
+	void Normalize()
+	{
+		it_T v;
+
+		for (int i = 0; i < m_Ord; i++)
+		{ 
+			v = GetVector(i);
+
+			double Norm = 0.0f;
+			for (int j = 0; j < m_ReSam; j++, ++v)
+				Norm += (*v) * (*v);
+
+			Norm = sqrt(Norm);
+			m_Norms[i] = Norm;
+
+			v = GetVector(i);
+			for (int j = 0; j < m_ReSam; j++, ++v)
+				*v /= Norm;
+		} // for(i)
+	}
 };
 
-#endif // !defined(AFX_BASIS_H__1536C284_C445_11D1_B2F6_006008332431__INCLUDED_)
+#endif 

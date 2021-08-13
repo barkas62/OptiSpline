@@ -458,6 +458,23 @@ ERR_CODE AppStroke_GetApproximatedPoints(hAPPSTROKE hAS, INT Dim, INT ReSam, FLO
 	return err_code_OK;
 }
 
+ERR_CODE AppStroke_GetResampledPoints(hAPPSTROKE hAS, INT Dim, INT ReSam, FLOAT* pRsmPoints)
+{
+	if (hAS == NULL || pRsmPoints == NULL)
+		return err_code_ZERO_POINTER_PASSED;
+
+	APPSTROKE* pAS = (APPSTROKE*)hAS;
+
+	if (pAS->m_Stroke.m_Dim <= 1 || pAS->m_ReSam <= 0)
+		return err_code_BAD_STRUCTURE_CONTENT;
+
+	if (Dim != pAS->m_Stroke.m_Dim || ReSam != pAS->m_ReSam)
+		return err_code_WRONG_PARAMETER;
+
+	memcpy(pRsmPoints, pAS->m_pRsm, Dim * ReSam * sizeof(FLOAT));
+
+	return err_code_OK;
+}
 
 
 

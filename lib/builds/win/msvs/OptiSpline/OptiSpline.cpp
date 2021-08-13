@@ -4,59 +4,46 @@
 #include "AppStroke.h"
 
 
-void* CreateOptiSpline(int nDim, int nSam, int nOrd, int nResam, float* pPnt) {
-	AppStroke* pAppStrk = new AppStroke();
-	pAppStrk->Init(nDim, nSam, nOrd, nResam, pPnt);
-	return (void*)pAppStrk;
+void* CreateOptiSpline(int nDim, int nSam, int nOrd, int nResam, double* pPnt) {
+	hAPPSTROKE hAS = AppStroke_Create();
+	AppStroke_Init(hAS, 2, nOrd, nResam, nSam, pPnt);
+	return (void*)hAS;
 }
 
 void DestroyOptiSpline(void* pInstance ) {
 	if( pInstance )
-		delete (AppStroke*)pInstance;
+		AppStroke_Delete( (hAPPSTROKE)pInstance );
 }
 
-void* CopyOptiSpline(void* pInstance) {
-	return pInstance ?
-		new AppStroke(*((AppStroke*)pInstance)) :
-		nullptr;
+void OptiSplineApprox(void* pInstance, int nStep, double MaxErr)
+{
+	AppStroke_ParamApp((hAPPSTROKE)pInstance, nStep, MaxErr, NULL);
 }
 
-void OptiSplineApprox(void* pInstance, int nStep, float MaxErr) {
-	AppStroke* pAppStrk = (AppStroke*)pInstance;
-	
-	pAppStrk->ParamApp(nStep, MaxErr);
+int GetOptiSplineApp(void* pInstance, double* pApp, int Dim, int ReSam) {
+	hAPPSTROKE hAS  = (hAPPSTROKE)pInstance;
+
+	AppStroke_GetApproximatedPoints(hAS, Dim, ReSam, pApp);
+
+	return ReSam;
 }
 
-int GetOptiSplineApp(void* pInstance, float* pApp, int Dim, int ReSam) {
-	AppStroke* pAppStrk = (AppStroke*)pInstance;
+int GetOptiSplineRsm(void* pInstance, double* pRsm, int Dim, int ReSam) {
+	hAPPSTROKE hAS = (hAPPSTROKE)pInstance;
 
-	if (Dim != pAppStrk->m_Dim || ReSam != pAppStrk->m_ReSam || pAppStrk->m_pApp == 0)
-		return 0;
+	AppStroke_GetResampledPoints(hAS, Dim, ReSam, pRsm);
 
-	memcpy(pApp, pAppStrk->m_pApp, pAppStrk->m_Dim * pAppStrk->m_ReSam * sizeof(float));
-
-	return pAppStrk->m_ReSam;
+	return ReSam;
 }
 
-int GetOptiSplineRsm(void* pInstance, float* pRsm, int Dim, int ReSam) {
-	AppStroke* pAppStrk = (AppStroke*)pInstance;
+double GetOptiSplineErr(void* pInstance) {
+	hAPPSTROKE hAS = (hAPPSTROKE)pInstance;
 
-	if (Dim != pAppStrk->m_Dim || ReSam != pAppStrk->m_ReSam || pAppStrk->m_pRsm == 0)
-		return 0;
-
-	memcpy(pRsm, pAppStrk->m_pRsm, pAppStrk->m_Dim * pAppStrk->m_ReSam * sizeof(float));
-
-	return pAppStrk->m_ReSam;
+	return AppStroke_GetRSMError(hAS);
 }
 
-float GetOptiSplineErr(void* pInstance) {
-	AppStroke* pAppStrk = (AppStroke*)pInstance;
+double GetOptiSplineLam(void* pInstance) {
+	hAPPSTROKE hAS = (hAPPSTROKE)pInstance;
 
-	return pAppStrk->m_Err;
-}
-
-float GetOptiSplineLam(void* pInstance) {
-	AppStroke* pAppStrk = (AppStroke*)pInstance;
-
-	return pAppStrk->m_Lam;
+	return AppStroke_GetLambda(hAS);
 }

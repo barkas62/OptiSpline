@@ -22,6 +22,7 @@ FLOAT AppStroke_GetMaxError(hAPPSTROKE hAS);
 FLOAT AppStroke_GetLambda  (hAPPSTROKE pAS);
 
 ERR_CODE AppStroke_GetApproximatedPoints(hAPPSTROKE pAS, INT Dim, INT ReSam, FLOAT* pAppPoints);
+ERR_CODE AppStroke_GetResampledPoints   (hAPPSTROKE pAS, INT Dim, INT ReSam, FLOAT* pRsmPoints);
 
 #ifdef __cplusplus
 }
