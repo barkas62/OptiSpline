@@ -1,11 +1,13 @@
 #ifndef _APPSTROKE_H_INCLUDED_
 #define _APPSTROKE_H_INCLUDED_
 
+#include "types.h"
+
 typedef VOID* hAPPSTROKE;
  
-#ifdef __cplusplus
+//#ifdef __cplusplus
 extern "C" {
-#endif 
+//#endif 
 hAPPSTROKE AppStroke_Create();
 VOID       AppStroke_Delete(hAPPSTROKE hAS);
 
@@ -22,8 +24,8 @@ FLOAT AppStroke_GetLambda  (hAPPSTROKE pAS);
 ERR_CODE AppStroke_GetApproximatedPoints(hAPPSTROKE pAS, INT Dim, INT ReSam, FLOAT* pAppPoints);
 ERR_CODE AppStroke_GetResampledPoints   (hAPPSTROKE pAS, INT Dim, INT ReSam, FLOAT* pRsmPoints);
 
-#ifdef __cplusplus
+//#ifdef __cplusplus
 }
-#endif
+//#endif
 
 #endif 

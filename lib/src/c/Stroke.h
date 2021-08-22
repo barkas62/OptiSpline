@@ -1,7 +1,6 @@
 #ifndef _STROKE_H_INCLUDED_
 #define _STROKE_H_INCLUDED_
 
-#include "types.h"
 
 typedef struct {
 	FLOAT    s;

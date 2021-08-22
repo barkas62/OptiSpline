@@ -11,7 +11,7 @@
 	#define FALSE 0
 	#define ZERO_PRECISION  0.000001  
 #endif 
- 
+
 typedef enum {
 	err_code_OK                    = 0,
 	err_code_ZERO_POINTER_PASSED   = 1,
@@ -20,5 +20,7 @@ typedef enum {
 	err_code_BAD_STRUCTURE_CONTENT = 4, 
 	err_code_ALGORITHM_FAILURE     = 5
 } ERR_CODE;
+
+#define _ABS(x) ((x) > 0 ? (x) :(-(x)))
 
 #endif

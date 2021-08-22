@@ -4,6 +4,7 @@
 #include <math.h>
 #include <malloc.h>
 
+#include "types.h"
 #include "Stroke.h"
 
 ERR_CODE Stroke_AddPoint(STROKE* pS, INT Dim, FLOAT* pPnt);

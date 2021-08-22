@@ -3,6 +3,8 @@
 #include <math.h>
 #include <memory.h>
 #include <malloc.h>
+
+#include "types.h"
 #include "Basis.h"
 
 BOOL Basis_Validate(BASIS* pB);

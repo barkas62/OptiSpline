@@ -1,10 +1,13 @@
 #include <math.h>
 #include <memory.h>
 #include <malloc.h>
-#include "AppStroke.h"
 
+#include "types.h"
+#include "AppStroke.h"
 #include "Stroke.h"
 #include "Basis.h"
+
+#define _ABS(x) ((x) > 0 ? (x) :(-(x)))
 
 typedef struct
 {
