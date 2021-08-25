@@ -43,8 +43,8 @@ VOID AppStroke_Tracing(INT Dim, INT ReSam, FLOAT* pApp, RSDATA* pAppRS);
 
 hAPPSTROKE AppStroke_Create()
 {
-	APPSTROKE* pAS = malloc(sizeof(APPSTROKE));
-	if (pAS != NULL);
+	APPSTROKE* pAS = (APPSTROKE*)malloc(sizeof(APPSTROKE));
+	if (pAS != NULL)
 		AppStroke_ZeroInit(pAS);
 
 	return (hAPPSTROKE)pAS;
