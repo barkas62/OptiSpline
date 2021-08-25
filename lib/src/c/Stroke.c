@@ -2,7 +2,7 @@
 
 #include <memory.h>
 #include <math.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "types.h"
 #include "Stroke.h"
