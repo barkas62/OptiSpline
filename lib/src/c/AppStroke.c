@@ -1,6 +1,6 @@
 #include <math.h>
 #include <memory.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "types.h"
 #include "AppStroke.h"
