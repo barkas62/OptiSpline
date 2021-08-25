@@ -68,11 +68,12 @@ function drawStroke(stroke, canvas, draw_src, draw_app, draw_rsm, draw_bez) {
     }
 
     if (draw_rsm && stroke.rsm_points.length != 0){
+      let radius = 1.5
       for (let i = 0; i < stroke.rsm_points.length; i++) {
           let x = stroke.rsm_points[2*i+0];
           let y = stroke.rsm_points[2*i+1];
           cx.beginPath();
-          cx.arc(x, y, 1, 0, 2*Math.PI, false);
+          cx.arc(x, y, radius, 0, 2*Math.PI, false);
           cx.strokeStyle = "black";
           cx.stroke();
       }
@@ -434,7 +435,8 @@ You may change the number of sampling points (<b>Resam</b>), or approximation or
 `;
 
 const iter_info = `
-Continue Iterations. See how approximation is improving and both <b>RMS Error</b> and <b>Max Error</b> are decreasing.<br><br>
+Continue to iterate by clicking the <b>Iterations</b> button. (Or press and hold ENTER key.)<br> 
+See how approximation is improving and both <b>RMS Error</b> and <b>Max Error</b> are decreasing.<br><br>
 Clicking <b>Reset</b> button restarts approximating iterations.<br>
 Changing <b>Resam</b> or <b>Order</b> also restarts approximation with new parameters.
 `
