@@ -1,6 +1,8 @@
 #ifndef _APPSTROKE_H_INCLUDED_
 #define _APPSTROKE_H_INCLUDED_
 
+#include "types.h"
+
 typedef VOID* hAPPSTROKE;
  
 #ifdef __cplusplus

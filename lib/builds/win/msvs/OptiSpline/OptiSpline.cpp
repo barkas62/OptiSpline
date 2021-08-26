@@ -1,7 +1,7 @@
 #include <memory.h>
 
-#include "OptiSpline.h"
 #include "AppStroke.h"
+#include "OptiSpline.h"
 
 
 void* CreateOptiSpline(int nDim, int nSam, int nOrd, int nResam, double* pPnt) {
