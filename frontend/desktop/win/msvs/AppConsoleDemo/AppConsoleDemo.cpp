@@ -44,7 +44,7 @@ int main()
 
     std::cout << "Initial Approximation Error: " << AppStrk.GetRMSErr() << std::endl;
 
-    int  nItr = 64000;
+    int  nItr = 32;
 
     auto start = high_resolution_clock::now();
 
