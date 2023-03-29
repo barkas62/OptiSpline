@@ -19,6 +19,7 @@ Sources are available, as well as demos and binaries for all major operating sys
 
 [bin](https://github.com/barkas62/optispline/bin) : compiled libraries and demos (Mac, Windows and Linux)
 
+[doc](https://github.com/barkas62/optispline/doc) : API Documentation. Not yet implemented. You may use [AppConsoleDemo.cpp](https://github.com/barkas62/OptiSpline/tree/master/frontend/desktop/win/msvs/AppConsoleDemo/AppConsoleDemo.cpp) as an example of using OptiSpline API.
 
 
 
